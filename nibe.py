@@ -88,7 +88,7 @@ nibe_registers = {
 # Define unique IDs and MQTT discovery configurations for each sensor
 mqtt_discovery_sensors = {
     "nibe/pump_speed_percent": {
-        "name": "Pump Speed Percent",
+        "name": "Pumpengeschwindigkeit",
         "unit_of_measurement": "%",
         "state_topic": "nibe/pump_speed_percent",
         "unique_id": "nibe_pump_speed_percent"
@@ -99,7 +99,7 @@ mqtt_discovery_sensors = {
 #        "unique_id": "nibe_cpu_id"
 #    },
     "nibe/inverter_temp_tho_ip": {
-        "name": "Inverter temp Tho-IP",
+        "name": "Invertertemp. Tho-IP",
         "state_class": "measurement",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
@@ -112,63 +112,63 @@ mqtt_discovery_sensors = {
     "unique_id": "nibe_operation_mode"
     },
     "nibe/condenser_off_max": {
-        "name": "Condenser Off (MAX)",
+        "name": "Kondensator aus (MAX)",
         "state_topic": "nibe/condenser_off_max",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_condenser_off_max"
     },
     "nibe/domestic_hot_water_bottom": {
-        "name": "Domestic Hot Water Bottom",
+        "name": "Brauchwasser unten",
         "state_topic": "nibe/domestic_hot_water_bottom",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_domestic_hot_water_bottom"
     },
     "nibe/tho_r1_evap_temp": {
-        "name": "Tho-R1 Evaporator Temp",
+        "name": "Verd. Temp. Tho-R1",
         "state_topic": "nibe/tho_r1_evap_temp",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_tho_r1_evap_temp"
     },
     "nibe/tho_r2_evap_temp": {
-        "name": "Tho-R2 Evaporator Temp",
+        "name": "Verd. Temp. Tho-R2",
         "state_topic": "nibe/tho_r2_evap_temp",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_tho_r2_evap_temp"
     },
     "nibe/suction_gas_temp_tho_s": {
-        "name": "Suction Gas Temp Tho-S",
+        "name": "Sauggastemp. Tho-S",
         "state_topic": "nibe/suction_gas_temp_tho_s",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_suction_gas_temp_tho_s"
     },
     "nibe/hot_gas_temp_tho_d": {
-        "name": "Hot Gas Temp Tho-D",
+        "name": "Heissgastemp. Tho-D",
         "state_topic": "nibe/hot_gas_temp_tho_d",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_hot_gas_temp_tho_d"
     },
     "nibe/liquid_temp_ams": {
-        "name": "Liquid Temp AMS",
+        "name": "Flüssigkeitstemperatur AMS",
         "state_topic": "nibe/liquid_temp_ams",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_liquid_temp_ams"
     },
     "nibe/resp_at_ams_tho_a": {
-        "name": "Response at AMS Tho-A",
+        "name": "Atemp. am AMS Tho-A",
         "state_topic": "nibe/resp_at_ams_tho_a",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_resp_at_ams_tho_a"
     },     
     "nibe/heating_curve": {
-        "name": "Heating Curve",
+        "name": "Heizkurvenverschiebung",
         "state_topic": "nibe/heating_curve",
         "state_class": "measurement",
         "unit_of_measurement": "°C",
@@ -177,14 +177,14 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_heating_curve"
     },
     "nibe/return_temp_c": {
-        "name": "Return Temperature",
+        "name": "Rücklauf",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "state_topic": "nibe/return_temp_c",
         "unique_id": "nibe_return_temp_c"
     },
     "nibe/degree_minutes": {
-        "name": "Degree Minutes",
+        "name": "Gradminuten",
         "state_topic": "nibe/degree_minutes",
         "state_class": "measurement",
         "unit_of_measurement": "°C",
@@ -193,47 +193,47 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_degree_minutes"
     },
     "nibe/domestic_hot_water_top_temp": {
-        "name": "Domestic Hot Water Top Temperature",
+        "name": "Brauchwasser oben",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "state_topic": "nibe/domestic_hot_water_top_temp",
         "unique_id": "nibe_domestic_hot_water_top_temp"
     },
     "nibe/max_df_compressor": {
-        "name": "Max DF Compressor",
+        "name": "Max dF Verdichter",
         "state_topic": "nibe/max_df_compressor",
         "unit_of_measurement": "Hz",
         "value_template": "{{ value | float }}",
         "unique_id": "nibe_max_df_compressor"
     },
     "nibe/verd_freq_reg_p": {
-        "name": "Verd Freq Reg P",
+        "name": "Verd. Freq. reg P",
         "state_topic": "nibe/verd_freq_reg_p",
         "unit_of_measurement": "Hz",
         "value_template": "{{ value | float }}",
         "unique_id": "nibe_verd_freq_reg_p"
     },
     "nibe/min_start_time_freq_min": {
-        "name": "Min Start Time Freq Min",
+        "name": "Min Startzeit Freq",
         "unit_of_measurement": "Hz",
         "state_topic": "nibe/min_start_time_freq_min",
         "unique_id": "nibe_min_start_time_freq_min"
     },
     "nibe/min_time_const_freq_min": {
-        "name": "Min Time Const Freq Min",
+        "name": "Minzeit konst. Freq",
         "state_topic": "nibe/min_time_const_freq_min",
         "unit_of_measurement": "Hz",
         "unique_id": "nibe_min_time_const_freq_min"
     },
     "nibe/comp_freq_grad_min": {
-        "name": "Comp Freq Grad Min",
+        "name": "Verd. Freq. GradMin",
         "state_topic": "nibe/comp_freq_grad_min",
         "unit_of_measurement": "Hz",
         "value_template": "{{ value | float }}",
         "unique_id": "nibe_comp_freq_grad_min"
     },
     "nibe/bw_reg_p": {
-        "name": "BW Reg P",
+        "name": "Bw reg P",
         "state_topic": "nibe/bw_reg_p",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
@@ -241,7 +241,7 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_bw_reg_p"
     },
     "nibe/bw_reg_q": {
-        "name": "BW Reg Q",
+        "name": "Bw reg Q",
         "state_topic": "nibe/bw_reg_q",
         "value_template": "{{ value | float }}",
         "unit_of_measurement": "°C",
@@ -249,7 +249,7 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_bw_reg_q"
     },
     "nibe/bw_reg_value_xp_percent": {
-        "name": "BW Reg Value XP Percent",
+        "name": "Bw reg Wert xP",
         "unit_of_measurement": "%",
         "state_topic": "nibe/bw_reg_value_xp_percent",
         "unique_id": "nibe_bw_reg_value_xp_percent"
@@ -287,7 +287,7 @@ mqtt_discovery_sensors = {
 #        "unique_id": "nibe_time_second"
 #    },
     "nibe/run_time_compressor_h": {
-        "name": "Run Time Compressor Hours",
+        "name": "Verdichterlaufzeit",
         "state_topic": "nibe/run_time_compressor_h",
         "device_class": "duration",
         "unit_of_measurement": "h",
@@ -295,37 +295,37 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_run_time_compressor_h"
     },
     "nibe/comp_freq_desired_hz": {
-        "name": "Comp Freq Desired Hz",
+        "name": "Verd. Freq. Soll",
         "unit_of_measurement": "Hz",
         "state_topic": "nibe/comp_freq_desired_hz",
         "unique_id": "nibe_comp_freq_desired_hz"
     },
     "nibe/comp_freq_actual_hz": {
-        "name": "Comp Freq Actual Hz",
+        "name": "Verd. Freq. Ist",
         "unit_of_measurement": "Hz",
         "state_topic": "nibe/comp_freq_actual_hz",
         "unique_id": "nibe_comp_freq_actual_hz"
     },
     "nibe/high_pressure_bar": {
-        "name": "High Pressure Bar",
+        "name": "Hochdruck",
         "unit_of_measurement": "bar",
         "state_topic": "nibe/high_pressure_bar",
         "unique_id": "nibe_high_pressure_bar"
     },
     "nibe/low_pressure_bar": {
-        "name": "Low Pressure Bar",
+        "name": "Niederdruck",
         "unit_of_measurement": "bar",
         "state_topic": "nibe/low_pressure_bar",
         "unique_id": "nibe_low_pressure_bar"
     },
     "nibe/ams_phase_is_a": {
-        "name": "AMS Phase Current",
+        "name": "AMS Phase Ist",
         "unit_of_measurement": "A",
         "state_topic": "nibe/ams_phase_is_a",
         "unique_id": "nibe_ams_phase_is_a"
     },
     "nibe/hysteresis": {
-        "name": "Hysteresis",
+        "name": "Hystere",
         "state_topic": "nibe/hysteresis",
         "state_class": "measurement",
         "unit_of_measurement": "°C",
@@ -334,7 +334,7 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_hysteresis"
     },
     "nibe/bw_reg_xp": {
-        "name": "BW Reg XP",
+        "name": "Bw reg xP",
         "state_topic": "nibe/bw_reg_xp",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
@@ -342,46 +342,46 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_bw_reg_xp"
     },
     "nibe/stop_temp_heating_c": {
-        "name": "Stop Temp Heating",
+        "name": "Stopptemperatur Heizen",
         "unit_of_measurement": "°C",
         "state_topic": "nibe/stop_temp_heating_c",
         "unique_id": "nibe_stop_temp_heating_c"
     },
     "nibe/domestic_hot_water_start_temp": {
-        "name": "Domestic Hot Water Start Temp",
+        "name": "Brauchwasser Starttemperatur",
         "unit_of_measurement": "°C",
         "state_topic": "nibe/domestic_hot_water_start_temp",
         "unique_id": "nibe_domestic_hot_water_start_temp"
     },
     "nibe/domestic_hot_water_stop_temp": {
-        "name": "Domestic Hot Water Stop Temp",
+        "name": "Brauchwasser Stoptemperatur",
         "unit_of_measurement": "°C",
         "state_topic": "nibe/domestic_hot_water_stop_temp",
         "unique_id": "nibe_domestic_hot_water_stop_temp"
     },
     "nibe/outdoor_temp_c": {
-        "name": "Outdoor Temperature",
+        "name": "Außentemperatur",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "state_topic": "nibe/outdoor_temp_c",
         "unique_id": "nibe_outdoor_temp_c"
     },
     "nibe/flow_setpoint_c": {
-        "name": "Flow Setpoint Temperature",
+        "name": "Vorlauf Soll",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "state_topic": "nibe/flow_setpoint_c",
         "unique_id": "nibe_flow_setpoint_c"
     },
     "nibe/flow_actual_c": {
-        "name": "Flow Actual Temperature",
+        "name": "Vorlauf Ist",
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "state_topic": "nibe/flow_actual_c",
         "unique_id": "nibe_flow_actual_c"
     },
     "nibe/compressor_starts": {
-        "name": "Compressor starts",
+        "name": "Verdichterstarts",
         "state_topic": "nibe/compressor_starts",
         "unit_of_measurement": "x",
         "state_class": "total_increasing",
@@ -389,12 +389,12 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_compressor_starts"
     },
     "nibe/heating_status": {
-        "name": "Heating Status",
+        "name": "Status Heizung",
         "state_topic": "nibe/heating_status",
         "unique_id": "nibe_heating_status"
     },
     "nibe/additional_heating": {
-        "name": "Additional Heating Allowed",
+        "name": "Zusatzheizung erlaubt",
         "state_topic": "nibe/additional_heating_allowed",
         "unique_id": "nibe_additional_heating_allowed",
         "value_template": "{{ value | int }}",  # Ensure Home Assistant interprets 0 and 1 as integers
@@ -403,9 +403,9 @@ mqtt_discovery_sensors = {
         "payload_not_available": "offline",
         "device": {
             "identifiers": ["nibe_heat_pump"],
-            "name": "Nibe Heat Pump",
+            "name": "Nibe Wärmepumpe",
             "manufacturer": "Nibe",
-            "model": "EasySolar",
+            "model": "ACVM 270",
             "sw_version": "1.0"
     }
 },
