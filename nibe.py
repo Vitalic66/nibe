@@ -12,9 +12,9 @@ logger = logging.getLogger('NIBE')
 # MQTT setup
 mqtt_client = mqtt.Client()
 mqtt_client.reconnect_delay_set(min_delay=1, max_delay=60)
-mqtt_client.username_pw_set(username="xxx", password="xxx")
+mqtt_client.username_pw_set(username="", password="")
 mqtt_client.will_set("nibe/status", "offline", retain=True)
-mqtt_client.connect("0.0.0.0", 1883, 60)
+mqtt_client.connect("192.168.178.92", 1883, 60)
 
 def publish_mqtt(topic, message):
     mqtt_client.publish(topic, message)
