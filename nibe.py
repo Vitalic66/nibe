@@ -475,45 +475,45 @@ def _decode(reg, raw):
 
         # Now that we have all three registers, interpret the state
         if reg28_value == 0x0000 and reg29_value == 0x8222 and reg30_value == 0x0032:
-            publish_mqtt("nibe/operation_mode", "Pois päältä") #pwer on, heatpump off
+            publish_mqtt("nibe/operation_mode", "Standby") #pwer on, heatpump off
         elif reg28_value == 0x4409 and reg29_value == 0xA22A and reg30_value == 0x01FE:
-            publish_mqtt("nibe/operation_mode", "Käyttövesi") #domestic water
+            publish_mqtt("nibe/operation_mode", "Brauchwasserbereitung, AMS an") #domestic water
         elif reg28_value == 0x0008 and reg29_value == 0xC22A and reg30_value == 0x000A:
-            publish_mqtt("nibe/operation_mode", "Pois päältä") #power on, heatpump off
+            publish_mqtt("nibe/operation_mode", "Heizungspumpe ist an, AMS aus") #power on, heatpump off
         elif reg28_value == 26634 and reg29_value == 49706 and reg30_value == 170:
             publish_mqtt("nibe/operation_mode", "Öljy paluu") #oil return
         elif reg28_value == 16394 and reg29_value == 49706 and reg30_value == 610:
-            publish_mqtt ("nibe/operation_mode", "Lämmitys") #heating
+            publish_mqtt ("nibe/operation_mode", "Heizung") #heating
         elif reg28_value == 16394 and reg29_value == 49706 and reg30_value == 10:
-            publish_mqtt ("nibe/operation_mode", "Lämmitys") #heating
+            publish_mqtt ("nibe/operation_mode", "Heizung") #heating
         elif reg28_value == 16650 and reg29_value == 49706 and reg30_value == 610:
-            publish_mqtt ("nibe/operation_mode", "Lämmitys") #heating
+            publish_mqtt ("nibe/operation_mode", "Heizung") #heating
         elif reg28_value == 0x0000 and reg29_value == 0xC22A and reg30_value == 0x003C:
-            publish_mqtt("nibe/operation_mode", "Vain sähkövastukset") #additional heating only
+            publish_mqtt("nibe/operation_mode", "Zusatzheizung an") #additional heating only
         elif reg28_value == 16385 and reg29_value == 41514 and reg30_value == 50:
-            publish_mqtt("nibe/operation_mode", "Käyttövesi") #domestic water
+            publish_mqtt("nibe/operation_mode", "Brauchwasser") #domestic water
         elif reg28_value == 16393 and reg29_value == 49706 and reg30_value == 10:
-            publish_mqtt("nibe/operation_mode", "Lämmitys") # heating
+            publish_mqtt("nibe/operation_mode", "Heizung") # heating
         elif reg28_value == 10 and reg29_value == 49706 and reg30_value == 10:
             publish_mqtt("nibe/operation_mode", "Pois päältä") #power on, heatpump off
         elif reg28_value == 28 and reg29_value == 49706 and reg30_value == 10:
-            publish_mqtt("nibe/operation_mode", "lämmitys") #heating
+            publish_mqtt("nibe/operation_mode", "Heizung") #heating
         elif reg28_value == 10 and reg29_value == 49706 and reg30_value == 610:
             publish_mqtt("nibe/operation_mode", "Pois päältä") #power on, heatpump off
         elif reg28_value == 32776 and reg29_value == 49706 and reg30_value == 10:
-            publish_mqtt("nibe/operation_mode", "Jäätymisensuoja") #freeze protection
+            publish_mqtt("nibe/operation_mode", "Frostschutz") #freeze protection
         elif reg28_value == 32778 and reg29_value == 49706 and reg30_value == 10:
-            publish_mqtt("nibe/operation_mode", "Jäätymisensuoja") #freeze protection
+            publish_mqtt("nibe/operation_mode", "Frostschutz") #freeze protection
         elif reg28_value == 17419 and reg29_value == 41514 and reg30_value == 510:
-            publish_mqtt("nibe/operation_mode", "Käyttövesi") #domestic water
+            publish_mqtt("nibe/operation_mode", "Brauchwasser") #domestic water
         elif reg28_value == 17425 and reg29_value == 41514 and reg30_value == 450:
-            publish_mqtt("nibe/operation_mode", "LisäLV") #extra domestic water
+            publish_mqtt("nibe/operation_mode", "extra Brauchwasser") #extra domestic water
         elif reg28_value == 24586 and reg29_value == 49706 and reg30_value == 270:
-            publish_mqtt("nibe/operation_mode", "Sulatus") #defrost
+            publish_mqtt("nibe/operation_mode", "Enteisen") #defrost
         elif reg28_value == 24842 and reg29_value == 49706 and reg30_value == 270:
-            publish_mqtt("nibe/operation_mode", "Sulatus") #defrost
+            publish_mqtt("nibe/operation_mode", "Enteisen") #defrost
         elif reg28_value == 17409 and reg29_value == 41514 and reg30_value == 30:
-            publish_mqtt("nibe/operation_mode", "Käyttövesi") #domestic water
+            publish_mqtt("nibe/operation_mode", "Brauchwasser") #domestic water
         else:
             logger.warning(f"Unknown combination of register values: reg28={reg28_value}, reg29={reg29_value}, reg30={reg30_value}")
             publish_mqtt("nibe/operation_mode", f"Unknown mode: reg28={reg28_value}, reg29={reg29_value}, reg30={reg30_value}")
@@ -531,11 +531,11 @@ def _decode(reg, raw):
         if value == 1:
             publish_mqtt("nibe/heating_status", "auto")
         elif value == 3:
-            publish_mqtt("nibe/heating_status", "lämmitys") #heating
+            publish_mqtt("nibe/heating_status", "Heizung") #heating
         elif value == 5:
-            publish_mqtt("nibe/heating_status", "lämminvesi") #domestic water
+            publish_mqtt("nibe/heating_status", "Brauchwasser") #domestic water
         elif value == 6:
-            publish_mqtt("nibe/heating_status", "lisäys (sähkö)") #additional heating
+            publish_mqtt("nibe/heating_status", "Zusatzheizung") #additional heating
         return None
 
     # Handle temperature and flow registers
