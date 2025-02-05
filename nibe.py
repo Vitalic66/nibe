@@ -428,9 +428,9 @@ def publish_discovery_payloads():
             "payload_not_available": "offline",
             "device": {
                 "identifiers": ["nibe_heat_pump"],
-                "name": "Mitsubishi heavy industries Heat Pump",
-                "manufacturer": "MHI",
-                "model": "HMA100v",
+                "name": "Nibe ACVM 270 Split",
+                "manufacturer": "Nibe",
+                "model": "ACVM 270",
                 "sw_version": "1.0"
             }
         }
