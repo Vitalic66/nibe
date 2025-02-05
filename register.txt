@@ -34,10 +34,10 @@ Sonstiges
 	5 Brauchwasser
 	6 Zusatzheizung
 
-Register						28		29 		30
-Heizung im Standby				0x0000	0x8222	0x0032
-Brauchwasserbereitung, AMS an	0x4409	0xA22A 	0x01FE
-Heizungspumpe ist an, AMS aus	0x0008	0xC22A	0x000A
-Zusatzheizung an				0x0000	0xC22A	0x003C
+Register			28		29 		30
+Heizung im Standby		0x0000		0x8222		0x0032
+Brauchwasserbereitung, AMS an	0x4409		0xA22A		0x01FE
+Heizungspumpe ist an, AMS aus	0x0008		0xC22A		0x000A
+Zusatzheizung an		0x0000		0xC22A		0x003C
 
 	
