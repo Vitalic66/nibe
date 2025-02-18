@@ -316,6 +316,7 @@ mqtt_discovery_sensors = {
         "name": "Niederdruck",
         "unit_of_measurement": "bar",
         "state_topic": "nibe/low_pressure_bar",
+        "value_template": "{{ value - 30 | float }}",
         "unique_id": "nibe_low_pressure_bar"
     },
     "nibe/ams_phase_is_a": {
