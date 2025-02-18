@@ -316,7 +316,6 @@ mqtt_discovery_sensors = {
         "name": "Niederdruck",
         "unit_of_measurement": "bar",
         "state_topic": "nibe/low_pressure_bar",
-        "value_template": "{{ value - 30 | float }}",
         "unique_id": "nibe_low_pressure_bar"
     },
     "nibe/ams_phase_is_a": {
@@ -540,9 +539,13 @@ def _decode(reg, raw):
         return None
 
     # Handle temperature and flow registers
-    if reg in [1, 5, 6, 7, 12, 23, 11, 13, 14, 15, 16, 17, 18, 21]:
+    if reg in [1, 5, 6, 7, 12, 23, 11, 13, 15, 16, 17, 18, 21]:
         logger.debug(f"Register {reg} (temperature/flow) value: {value}")
         return float(unpack('h', pack('H', value))[0] / 10)
+    # Low pressure returny value + 30    
+    if reg in [14]:
+        logger.debug(f"Register {reg} (temperature/flow) value: {value}")
+        return float(unpack('h', pack('H', value))[0] / 10 - 30)
 
     # Handle general integer registers
     if reg in [0, 33, 34, 35, 36, 38, 44, 45, 46, 48, 100, 101, 102, 103, 104, 105]:
