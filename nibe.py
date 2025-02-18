@@ -543,9 +543,9 @@ def _decode(reg, raw):
         logger.debug(f"Register {reg} (temperature/flow) value: {value}")
         return float(unpack('h', pack('H', value))[0] / 10)
     # Low pressure returny value + 30    
-    if reg in [14]:
+    if reg == 14:
         logger.debug(f"Register {reg} (temperature/flow) value: {value}")
-        return float(unpack('h', pack('H', value))[0] / 10 - 30)
+        return float((unpack('h', pack('H', value))[0] / 10) - 30)
 
     # Handle general integer registers
     if reg in [0, 33, 34, 35, 36, 38, 44, 45, 46, 48, 100, 101, 102, 103, 104, 105]:
