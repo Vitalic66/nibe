@@ -670,6 +670,7 @@ def run():
                                 publish_mqtt(mqtt_topic, value)
                 ret = ser.read(3)
                 if ret[1] == 0xf1:
+                    logger.warning("88888888888888888bbbbbbbbbbbbbbb")
                     frm = ser.read(4)
                     if frm[0] == 0x03:     #Falls das erste Byte der empfangenen Nachricht wieder 0x03 ist, wird sie ignoriert. Das passiert am Ende der Nachricht (03 00).
                         continue
@@ -679,7 +680,7 @@ def run():
                     for i in frm[:-1]:          
                         crc ^= i
                     if crc != frm[-1]:
-                        logger.warning("Frame CRC error")
+                        logger.warning("Frame CRC error 88888888888888888bbbbbbbbbbbbbbb")
                         continue
                     msg = frm[4:]
                     l = len(msg)
