@@ -638,7 +638,7 @@ def run():
                 if ret[0] != 0x00 or (ret[1] not in [0x14, 0xf1]):
                     logger.debug("Invalid start frame")
                     continue
-                if ret[1] != 0x14:
+                if ret[1] == 0x14:
                     ser.write(b"\x06")
                     frm = ser.read(4)
                     if frm[0] == 0x03: 
@@ -669,7 +669,7 @@ def run():
                                 mqtt_topic = nibe_registers[reg]
                                 publish_mqtt(mqtt_topic, value)
                 #ret = ser.read(3)
-                elif ret[1] != 0xf1:
+                elif ret[1] == 0xf1:
                     logger.debug("8888888888888888888888888888888888888888888888888888888888888888bbbbbbbbbbbbbbb")
                     frm = ser.read(5)
                     if frm[0] == 0x03:     #Falls das erste Byte der empfangenen Nachricht wieder 0x03 ist, wird sie ignoriert. Das passiert am Ende der Nachricht (03 00).
