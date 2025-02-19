@@ -669,7 +669,8 @@ def run():
                                 mqtt_topic = nibe_registers[reg]
                                 publish_mqtt(mqtt_topic, value)
                 #ret = ser.read(3)
-                elif ret[1] == 0xf1:
+                #elif ret[1] == 0xf1:
+                if ret[1] == 0xf1
                     logger.debug("8888888888888888888888888888888888888888888888888888888888888888bbbbbbbbbbbbbbb")
                     frm = ser.read(5)
                     if frm[0] == 0x03:     #Falls das erste Byte der empfangenen Nachricht wieder 0x03 ist, wird sie ignoriert. Das passiert am Ende der Nachricht (03 00).
@@ -698,8 +699,8 @@ def run():
                             if value is not None:
                                 mqtt_topic = nibe_registers[reg]
                                 publish_mqtt(mqtt_topic, value)
-                else:
-                    logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
+                #else:
+                    #logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
             except Exception as e:
                 logger.warning(f"Error in Nibe data processing: {e}")
                 time.sleep(1)
