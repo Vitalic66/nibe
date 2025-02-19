@@ -691,7 +691,7 @@ def run():
                     i = 4
                     while i <= l:
                         reg = msg[i - 4]  # Fix: Korrekte Register-Indexierung
-                        if i != l and (msg[i] == 0x00 or i == (l - 1)):
+                        if i != l and (msg[i - 1] == 0x00 or i == (l - 1)):
                             raw = bytes([msg[i - 3], msg[i - 2]])  # Fix: Richtige Byte-Kombination
                             i += 4
                         else:
