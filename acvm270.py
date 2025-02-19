@@ -399,7 +399,7 @@ mqtt_discovery_sensors = {
         "unique_id": "nibe_heating_status"
     },
     ######################################################
-        },
+    
     "nibe/8b_temp1": {
         "name": "8b Temp1",
         "state_topic": "nibe/8b_temp1",
