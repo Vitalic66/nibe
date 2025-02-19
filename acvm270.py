@@ -669,10 +669,10 @@ def run():
                                 mqtt_topic = nibe_registers[reg]
                                 publish_mqtt(mqtt_topic, value)
                 if ret[1] == 0xf1:
-                    frm = ser.read(4)
+                    frm = ser.read(5)
                     if frm[0] == 0x03:     #Falls das erste Byte der empfangenen Nachricht wieder 0x03 ist, wird sie ignoriert. Das passiert am Ende der Nachricht (03 00).
                         continue
-                    l = int(frm[3])
+                    l = int(frm[4])
                     frm += ser.read(l + 1)
                     crc = 0
                     for i in frm[:-1]:          
