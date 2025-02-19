@@ -6,7 +6,7 @@ from struct import unpack, pack
 
 # Setup logger
 #logging.basicConfig(level=logging.WARNING)
-logging.basicConfig(level=logging.WARNING, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('NIBE')
 
 # MQTT setup
