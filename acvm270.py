@@ -675,7 +675,7 @@ def run():
                     l = int(frm[3])
                     frm += ser.read(l + 1)
                     crc = 0
-                    for i in frm[-1]:          
+                    for i in frm[:-1]:          
                         crc ^= i
                     if crc != frm[-1]:
                         logger.warning("Frame CRC error")
