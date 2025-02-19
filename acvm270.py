@@ -659,7 +659,7 @@ def run():
                     while i <= l:
                         reg = msg[i - 3]
                         if i != l and (msg[i] == 0x00 or i == (l - 1)):
-                            raw = bytes((int([msg[i - 2], 16) // 16 << 8), msg[i - 1]])
+                            raw = bytes([msg[i - 2], msg[i - 1]])
                             i += 4
                         else:
                             raw = bytes([msg[i - 2]])
@@ -676,18 +676,18 @@ def run():
                     l = int(frm[3])
                     frm += ser.read(l + 1)
                     crc = 0
-                    for i in frm:          #hier nicht -1, da 06 nicht nach frm geschrieben wird
+                    for i in frm[-1]:          
                         crc ^= i
-                    if crc != frm:
+                    if crc != frm[-1]:
                         logger.warning("Frame CRC error")
                         continue
-                    msg = frm[4:0]
+                    msg = frm[4:]
                     l = len(msg)
                     i = 4
-                        while i <= l:
-                        reg = msg[i - 4]
+                    while i <= l:
+                        reg = msg[i - 4]  # Fix: Korrekte Register-Indexierung
                         if i != l and (msg[i] == 0x00 or i == (l - 1)):
-                            raw = bytes([msg[i - 3], msg[i - 2]])
+                            raw = bytes([msg[i - 3], msg[i - 2]])  # Fix: Richtige Byte-Kombination
                             i += 4
                         else:
                             raw = bytes([msg[i - 2]])
