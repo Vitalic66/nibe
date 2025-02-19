@@ -401,21 +401,29 @@ mqtt_discovery_sensors = {
     ######################################################
     "nibe/8b_temp1": {
         "name": "8b Temp1",
+        "unit_of_measurement": "°C",
+        "device_class": "temperature",
         "state_topic": "nibe/8b_temp1",
         "unique_id": "nibe_8b_temp1"
     },
     "nibe/8b_temp2": {
         "name": "8b Temp2",
+        "unit_of_measurement": "°C",
+        "device_class": "temperature",
         "state_topic": "nibe/8b_temp2",
         "unique_id": "nibe_8b_temp2"
     },
     "nibe/8b_temp3": {
         "name": "8b Temp3",
+        "unit_of_measurement": "°C",
+        "device_class": "temperature",
         "state_topic": "nibe/8b_temp3",
         "unique_id": "nibe_8b_temp3"
     },
     "nibe/8b_temp4": {
         "name": "8b Temp4",
+        "unit_of_measurement": "°C",
+        "device_class": "temperature",
         "state_topic": "nibe/8b_temp4",
         "unique_id": "nibe_8b_temp4"
     },
@@ -608,7 +616,7 @@ def _decode(reg, raw):
     # Handle 8b message temperatures
     if reg in [128, 129, 131, 135]:
         logger.debug(f"Register {reg} (temperature) value: {value}")
-        return int(unpack('h', pack('H', value))[0] / 10)
+        return float(unpack('h', pack('H', value))[0] / 10)
 
     # Log unknown registers
     logger.warning(f"Register {reg} is not handled")
