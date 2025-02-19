@@ -671,11 +671,14 @@ def run():
                 #ret = ser.read(3)
                 #elif ret[1] == 0xf1:
                 if ret[1] == 0xf1:
+                    ack = ser.read(1)
+                    if ack[0] != 0x06:
+                        continue
                     logger.debug("8888888888888888888888888888888888888888888888888888888888888888bbbbbbbbbbbbbbb")
-                    frm = ser.read(5)
+                    frm = ser.read(4)
                     if frm[0] == 0x03:     #Falls das erste Byte der empfangenen Nachricht wieder 0x03 ist, wird sie ignoriert. Das passiert am Ende der Nachricht (03 00).
                         continue
-                    l = int(frm[4])
+                    l = int(frm[3])
                     frm += ser.read(l + 1)
                     crc = 0
                     for i in frm[:-1]:          
