@@ -82,6 +82,11 @@ nibe_registers = {
     17: "nibe/hot_gas_temp_tho_d",
     18: "nibe/liquid_temp_ams",
     21: "nibe/resp_at_ams_tho_a",
+    #############################
+    128: "nibe/8b_temp1",
+    129: "nibe/8b_temp2",
+    131: "nibe/8b_temp3",
+    135: "nibe/8b_temp4",
 }
   
 
@@ -393,6 +398,29 @@ mqtt_discovery_sensors = {
         "state_topic": "nibe/heating_status",
         "unique_id": "nibe_heating_status"
     },
+    ######################################################
+        },
+    "nibe/8b_temp1": {
+        "name": "8b Temp1",
+        "state_topic": "nibe/8b_temp1",
+        "unique_id": "nibe_8b_temp1"
+    },
+    "nibe/8b_temp2": {
+        "name": "8b Temp2",
+        "state_topic": "nibe/8b_temp2",
+        "unique_id": "nibe_8b_temp2"
+    },
+    "nibe/8b_temp3": {
+        "name": "8b Temp3",
+        "state_topic": "nibe/8b_temp3",
+        "unique_id": "nibe_8b_temp3"
+    },
+    "nibe/8b_temp4": {
+        "name": "8b Temp4",
+        "state_topic": "nibe/8b_temp4",
+        "unique_id": "nibe_8b_temp4"
+    },
+######################################################
     "nibe/additional_heating": {
         "name": "Zusatzheizung erlaubt",
         "state_topic": "nibe/additional_heating_allowed",
@@ -578,6 +606,11 @@ def _decode(reg, raw):
         logger.debug(f"Register {reg} (temperature) value: {value}")
         return float(value)
 
+    # Handle 8b message temperatures
+    if reg in [128, 129, 131, 135]:
+        logger.debug(f"Register {reg} (temperature) value: {value}")
+        return int(unpack('h', pack('H', value))[0] / 10)
+
     # Log unknown registers
     logger.warning(f"Register {reg} is not handled")
     return None
@@ -603,38 +636,67 @@ def run():
                     continue
                 logger.debug("Start byte found, reading data...")
                 ret = ser.read(2)
-                if ret[0] != 0x00 or ret[1] != 0x14:
+                if ret[0] != 0x00 or (ret[1] not in [0x14, 0xf1]):
                     logger.debug("Invalid start frame")
                     continue
-                ser.write(b"\x06")
-                frm = ser.read(4)
-                if frm[0] == 0x03:
-                    continue
-                l = int(frm[3])
-                frm += ser.read(l + 1)
-                ser.write(b"\x06")
-                crc = 0
-                for i in frm[:-1]:
-                    crc ^= i
-                if crc != frm[-1]:
-                    logger.warning("Frame CRC error")
-                    continue
-                msg = frm[4:-1]
-                l = len(msg)
-                i = 4
-                while i <= l:
-                    reg = msg[i - 3]
-                    if i != l and (msg[i] == 0x00 or i == (l - 1)):
-                        raw = bytes([msg[i - 2], msg[i - 1]])
-                        i += 4
-                    else:
-                        raw = bytes([msg[i - 2]])
-                        i += 3
-                    if reg in nibe_registers:
-                        value = _decode(reg, raw)
-                        if value is not None:
-                            mqtt_topic = nibe_registers[reg]
-                            publish_mqtt(mqtt_topic, value)
+                if ret[1] == 0x14:
+                    ser.write(b"\x06")
+                    frm = ser.read(4)
+                    if frm[0] == 0x03: 
+                        continue
+                    l = int(frm[3])
+                    frm += ser.read(l + 1)
+                    ser.write(b"\x06")
+                    crc = 0
+                    for i in frm[:-1]:
+                        crc ^= i
+                    if crc != frm[-1]:
+                        logger.warning("Frame CRC error")
+                        continue
+                    msg = frm[4:-1]
+                    l = len(msg)
+                    i = 4
+                    while i <= l:
+                        reg = msg[i - 3]
+                        if i != l and (msg[i] == 0x00 or i == (l - 1)):
+                            raw = bytes((int([msg[i - 2], 16) // 16 << 8), msg[i - 1]])
+                            i += 4
+                        else:
+                            raw = bytes([msg[i - 2]])
+                            i += 3
+                        if reg in nibe_registers:
+                            value = _decode(reg, raw)
+                            if value is not None:
+                                mqtt_topic = nibe_registers[reg]
+                                publish_mqtt(mqtt_topic, value)
+                if ret[1] == 0xf1:
+                    frm = ser.read(4)
+                    if frm[0] == 0x03:     #Falls das erste Byte der empfangenen Nachricht wieder 0x03 ist, wird sie ignoriert. Das passiert am Ende der Nachricht (03 00).
+                        continue
+                    l = int(frm[3])
+                    frm += ser.read(l + 1)
+                    crc = 0
+                    for i in frm:          #hier nicht -1, da 06 nicht nach frm geschrieben wird
+                        crc ^= i
+                    if crc != frm:
+                        logger.warning("Frame CRC error")
+                        continue
+                    msg = frm[4:0]
+                    l = len(msg)
+                    i = 4
+                        while i <= l:
+                        reg = msg[i - 4]
+                        if i != l and (msg[i] == 0x00 or i == (l - 1)):
+                            raw = bytes([msg[i - 3], msg[i - 2]])
+                            i += 4
+                        else:
+                            raw = bytes([msg[i - 2]])
+                            i += 3
+                        if reg in nibe_registers:
+                            value = _decode(reg, raw)
+                            if value is not None:
+                                mqtt_topic = nibe_registers[reg]
+                                publish_mqtt(mqtt_topic, value)
             except Exception as e:
                 logger.warning(f"Error in Nibe data processing: {e}")
                 time.sleep(1)
