@@ -539,13 +539,9 @@ def _decode(reg, raw):
         return None
 
     # Handle temperature and flow registers
-    if reg in [1, 5, 6, 7, 12, 23, 11, 13, 15, 16, 17, 18, 21]:
+    if reg in [1, 5, 6, 7, 12, 23, 11, 13, 14, 15, 16, 17, 18, 21]:
         logger.debug(f"Register {reg} (temperature/flow) value: {value}")
         return float(unpack('h', pack('H', value))[0] / 10)
-    # Low pressure returny value + 30    
-    if reg == 14:
-        logger.debug(f"Register {reg} (temperature/flow) value: {value}")
-        return float((unpack('h', pack('H', value))[0] / 10) - 30)
 
     # Handle general integer registers
     if reg in [0, 33, 34, 35, 36, 38, 44, 45, 46, 48, 100, 101, 102, 103, 104, 105]:
@@ -563,9 +559,14 @@ def _decode(reg, raw):
         return int(value / 10)
 
     # Handle frequency, pressure, phase, and runtime registers
-    if reg in [9, 10, 19, 20, 22, 24]:
+    if reg in [9, 10, 19, 22, 24]:
         logger.debug(f"Register {reg} (frequency/pressure) value: {value}")
         return float(value / 10)
+        
+    # Low pressure return value + 30    
+    if reg == 20:
+        logger.debug(f"Register {reg} (temperature/flow) value: {value}")
+        return float((unpack('h', pack('H', value))[0] / 10) - 30)        
 
     # Handle hysteresis and BW registers
     if reg in [40, 47]:
