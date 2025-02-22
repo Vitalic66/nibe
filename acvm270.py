@@ -6,7 +6,7 @@ from struct import unpack, pack
 
 # Setup logger
 #logging.basicConfig(level=logging.WARNING)
-logging.basicConfig(level=logging.DEBUG, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.WARNING, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('NIBE')
 
 # MQTT setup
@@ -601,8 +601,11 @@ def _decode(reg, raw):
     # Low pressure return value + 30    
     if reg == 20:
         logger.debug(f"Register {reg} (temperature/flow) value: {value}")
-        return float((unpack('h', pack('H', value))[0] / 10) - 30)        
-
+        if value > 100:
+            return float((unpack('h', pack('H', value))[0] / 10) - 30)        
+        else:
+            return float(unpack('h', pack('H', value))[0] / 10)
+    
     # Handle hysteresis and BW registers
     if reg in [40, 47]:
         logger.debug(f"Register {reg} (hysteresis/BW reg) value: {value}")
