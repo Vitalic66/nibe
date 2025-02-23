@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import serial
 import argparse
-import logging
-from struct import unpack, pack
 
 # Erwartete Byte-Sequenz vor dem Senden
 EXPECTED_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03 00")
@@ -10,7 +8,7 @@ EXPECTED_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03 00")
 def calculate_crc(msg):
     """ Berechnet das XOR-CRC über alle Bytes außer dem letzten """
     crc = 0
-    for byte in msg[]:
+    for byte in msg:
         crc ^= byte
     return crc
 
@@ -74,9 +72,9 @@ def main():
     if length_from_msg != actual_length:
         print(f"⚠️ Warnung: Das vierte Byte ({length_from_msg}) passt nicht zur tatsächlichen Länge ({actual_length}). Wird angepasst.")
 
-    # CRC berechnen und anfügen
+    # CRC berechnen und anfügen (über alle Bytes)
     crc = calculate_crc(msg)
-    message_with_crc = msg[] + bytes([crc])
+    message_with_crc = msg + bytes([crc])
 
     print(f"✅ CRC berechnet: {crc:02X}")
     print(f"📤 Nachricht zum Senden bereit: {message_with_crc.hex(' ')}")
