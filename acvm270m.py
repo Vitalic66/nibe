@@ -32,10 +32,10 @@ ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=seri
 logger.debug("Serial port opened successfully")
 
 # Erwartete Sequenz zur Aktivierung des Sendebefehls
-TRIGGER_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03")
+TRIGGER_SEQUENCE = bytes.fromhex("00 f5 06 55 00 59 02 c2 2a e6 06 03 00 f9 06 03")
 
 # Nachricht, die gesendet wird, wenn Trigger-Sequenz erkannt wurde
-SEND_MESSAGE = bytes.fromhex("D0 80 56 50 49 28 64 04 02 0A 9D 00")
+SEND_MESSAGE = bytes.fromhex("d0 00 59 07 25 02 09 16 10 00 01 a7")
 
 # Variable zur Steuerung des MQTT-gestützten Sendebefehls
 send_command_active = False
