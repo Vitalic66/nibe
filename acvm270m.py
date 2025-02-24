@@ -9,12 +9,15 @@ from struct import unpack, pack
 logging.basicConfig(level=logging.WARNING, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('NIBE')
 
-# MQTT setup
+# MQTT Setup
+MQTT_BROKER = "192.168.178.92"
+MQTT_PORT = 1883
+MQTT_TOPIC_TRIGGER = "nibe/send_command"
+
 mqtt_client = mqtt.Client()
-mqtt_client.reconnect_delay_set(min_delay=1, max_delay=60)
 mqtt_client.username_pw_set(username="", password="")
 mqtt_client.will_set("nibe/status", "offline", retain=True)
-mqtt_client.connect("192.168.178.92", 1883, 60)
+mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
 def publish_mqtt(topic, message):
     mqtt_client.publish(topic, message)
@@ -32,10 +35,10 @@ ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=seri
 logger.debug("Serial port opened successfully")
 
 # Erwartete Sequenz zur Aktivierung des Sendebefehls
-TRIGGER_SEQUENCE = bytes.fromhex("00 f5 06 55 00 59 02 c2 2a e6 06 03 00 f9 06 03")
+TRIGGER_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03")
 
 # Nachricht, die gesendet wird, wenn Trigger-Sequenz erkannt wurde
-SEND_MESSAGE = bytes.fromhex("d0 00 59 07 25 02 09 16 10 00 01 a7")
+SEND_MESSAGE = bytes.fromhex("D0 80 56 50 49 28 64 04 02 0A 9D 00")
 
 # Variable zur Steuerung des MQTT-gestützten Sendebefehls
 send_command_active = False
