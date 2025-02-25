@@ -50,7 +50,7 @@ def on_message(client, userdata, msg):
         payload = msg.payload.decode()
         if payload.lower() == "send":
             send_command_active = True
-            print("MQTT-Trigger empfangen: Nachricht wird gesendet, sobald die Trigger-Sequenz erkannt wird.")
+            print(f"MQTT-Trigger empfangen: Nachricht wird gesendet, sobald die Trigger-Sequenz {TRIGGER_SEQUENCE} erkannt wird.")
         elif payload.lower() == "reset":
             send_command_active = False
             print("MQTT-Trigger wurde zurückgesetzt.")
