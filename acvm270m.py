@@ -661,6 +661,7 @@ def wait_for_sequence():
 
     while True:
         byte = ser.read(1)  # Einzelnes Byte lesen
+        print(f"byte: {byte})
         if not byte:
             continue
 
