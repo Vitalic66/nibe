@@ -30,7 +30,7 @@ def publish_availability(status):
 
 # Serial connection to Nibe heat pump (adjust COM port for Windows)
 serial_port = "/dev/ttyUSB0"  # Adjust to your correct COM port
-ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=3)
+ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
 
 logger.debug("Serial port opened successfully")
 
@@ -38,7 +38,7 @@ logger.debug("Serial port opened successfully")
 TRIGGER_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03")
 
 # Nachricht, die gesendet wird, wenn Trigger-Sequenz erkannt wurde
-SEND_MESSAGE = bytes.fromhex("D0 80 56 50 49 28 64 04 02 0A 9D 00")
+SEND_MESSAGE = bytes.fromhex("D0 00 59 07 25 02 09 16 10 00 01 A7")
 
 # Variable zur Steuerung des MQTT-gestützten Sendebefehls
 send_command_active = False
@@ -50,10 +50,10 @@ def on_message(client, userdata, msg):
         payload = msg.payload.decode()
         if payload.lower() == "send":
             send_command_active = True
-            logger.info("MQTT-Trigger empfangen: Nachricht wird gesendet, sobald die Trigger-Sequenz erkannt wird.")
+            print("MQTT-Trigger empfangen: Nachricht wird gesendet, sobald die Trigger-Sequenz erkannt wird.")
         elif payload.lower() == "reset":
             send_command_active = False
-            logger.info("MQTT-Trigger wurde zurückgesetzt.")
+            print("MQTT-Trigger wurde zurückgesetzt.")
 
 # MQTT Client Setup
 mqtt_client.on_message = on_message
@@ -671,7 +671,7 @@ def wait_for_sequence():
             buffer.pop(0)
 
         if bytes(buffer) == TRIGGER_SEQUENCE:
-            logger.info("Erwartete Sequenz empfangen!")
+            print("Erwartete Sequenz empfangen!")
             return True
 
 # Serielle Nachricht senden
@@ -681,11 +681,11 @@ def send_serial_message():
             #ser.open()
 
         ser.write(SEND_MESSAGE)
-        ser.flush()
-        logger.info(f"Nachricht gesendet: {SEND_MESSAGE.hex(' ')}")
+        #ser.flush()
+        print(f"Nachricht gesendet: {SEND_MESSAGE.hex(' ')}")
         # publish_mqtt("nibe/status", "Nachricht gesendet")
     except Exception as e:
-        logger.error(f"Fehler beim Senden der Nachricht: {e}")
+        print(f"Fehler beim Senden der Nachricht: {e}")
 
 def run():
     logger.info("Starting the main loop...")
@@ -696,7 +696,7 @@ def run():
     # Publish discovery payloads for all sensors
     publish_discovery_payloads()
 
-    mqtt_client.loop_start()
+    #mqtt_client.loop_start()
     try:
         while True:
             try:
