@@ -665,6 +665,7 @@ def wait_for_sequence():
             continue
 
         buffer.append(byte[0])
+        print(f"Puffer: {buffer}")
 
         # Fenster auf Sequenzlänge begrenzen
         if len(buffer) > len(TRIGGER_SEQUENCE):
