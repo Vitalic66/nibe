@@ -660,6 +660,10 @@ def wait_for_sequence():
     buffer = bytearray()
 
     while True:
+    
+        if not ser.is_open:
+            ser.open()
+            
         byte = ser.read(1)  # Einzelnes Byte lesen
         print(f"byte: {byte}")
         if not byte:
