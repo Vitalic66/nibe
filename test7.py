@@ -4,7 +4,14 @@ import argparse
 import time
 
 # Erwartete Byte-Sequenz vor dem Senden
-EXPECTED_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03 00 F9 06 03")
+#EXPECTED_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03 00 F9 06 03")
+
+# Erwartete Byte-Sequenz vor dem Senden (mit Wildcards an Position 5, 6 und 7)
+EXPECTED_SEQUENCE = [
+    0xA0, 0x00, 0x59, 0x02,  # Feste Bytes
+    None, None, None,         # Wildcards (beliebige Werte)
+    0x06, 0x03, 0x00, 0xF9, 0x06, 0x03
+]
 
 def calculate_crc(msg):
     """ Berechnet das XOR-CRC über alle Bytes außer dem letzten """
