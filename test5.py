@@ -38,10 +38,6 @@ def wait_for_sequence(serial_port):
             #ser.close()
             return True
 
-    except Exception as e:
-        print(f"❌ Fehler beim Empfangen der Sequenz: {e}")
-        return False
-
 def send_message(serial_port, message_bytes):
     """ Sendet eine Byte-Nachricht über die serielle Schnittstelle mit spezifischen Paritäten """
 
