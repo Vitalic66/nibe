@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import serial
 import argparse
+import time
 
 # Erwartete Byte-Sequenz vor dem Senden
 EXPECTED_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03 00 F9 06 03")
