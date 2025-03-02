@@ -103,7 +103,7 @@ def main():
     print(f"📤 Nachricht zum Senden bereit: {message_with_crc.hex(' ')}")
 
     # Nachricht senden (wenn Sequenz empfangen wurde)
-    send_message(args.port, message_with_crc)
+    send_message(args.port_mark, args.port_space, message_with_crc)
 
 if __name__ == "__main__":
     main()
