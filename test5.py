@@ -80,7 +80,9 @@ def send_message(serial_port, message_bytes):
                 ser.write(bytes.fromhex("03"))
                 ser.flush()
                 print(f"📤 Gesendet mit PARITY_MARK: 03")
+        
         ser.close()
+    
     except Exception as e:
         print(f"❌ Fehler beim Senden der Nachricht: {e}")
 
