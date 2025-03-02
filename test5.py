@@ -116,6 +116,3 @@ def main():
 
     # Nachricht senden (wenn Sequenz empfangen wurde)
     send_message(args.port, message_with_crc)
-
-if __name__ == "__main__":
-    main()
