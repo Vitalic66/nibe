@@ -42,8 +42,6 @@ def send_message(serial_port, message_bytes):
     """ Sendet eine Byte-Nachricht über die serielle Schnittstelle mit spezifischen Paritäten """
 
     try:
-        #ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3, rtscts=False, dsrdtr=False, xonxoff=False)
-
         # 1️⃣ Warte auf Sequenz, bevor gesendet wird
         if wait_for_sequence(ser):
 
