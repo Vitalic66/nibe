@@ -13,7 +13,7 @@ def calculate_crc(msg):
         crc ^= byte
     return crc
 
-def wait_for_sequence(serial_port):
+def wait_for_sequence(ser):
     """ Wartet, bis die erwartete Sequenz empfangen wurde """
     print("🔍 Warte auf die Sequenz:", EXPECTED_SEQUENCE.hex(' '))
     
