@@ -4,7 +4,7 @@ import argparse
 import time
 
 # Erwartete Byte-Sequenz vor dem Senden
-EXPECTED_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03 00")
+EXPECTED_SEQUENCE = bytes.fromhex("A0 00 59 02 26 3E E3 06 03 00 F9 06 03")
 
 def calculate_crc(msg):
     """ Berechnet das XOR-CRC über alle Bytes außer dem letzten """
@@ -37,48 +37,52 @@ def send_message(serial_port, message_bytes):
     """ Sendet eine Byte-Nachricht über die serielle Schnittstelle mit spezifischen Paritäten """
 
     try:
-        # 1️⃣ Senden der ersten beiden Bytes "00 F9" mit PARITY_MARK
-        ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
-        ser.write(bytes.fromhex("00 F9"))
-        ser.flush()
+        if wait_for_sequence(ser):        
+        
+            # 1️⃣ Senden der ersten beiden Bytes "00 F9" mit PARITY_MARK
+            ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
+            ser.write(bytes.fromhex("00 F9"))
+            ser.flush()
+            ser.close()
+            print(f"📤 Gesendet mit PARITY_MARK: 00 F9")
+
+            time.sleep(0.05)  # Kleiner Delay, um Umschaltung zu stabilisieren
+
+            # 1️⃣ Senden der ersten beiden Bytes "00 F9" mit PARITY_MARK
+            ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_SPACE, timeout=3)
+            ser.write(bytes.fromhex("06"))
+            ser.flush()
+            ser.close()
+            print(f"📤 Gesendet mit PARITY_SPACE: 06")
+
+            time.sleep(0.05)  # Kleiner Delay, um Umschaltung zu stabilisieren
+
+            # 2️⃣ Senden der verarbeiteten Eingabe (inklusive CRC) mit PARITY_MARK
+            ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_SPACE, timeout=3)
+            ser.write(message_bytes)
+            ser.flush()
+            ser.close()
+            print(f"📤 Nachricht mit PARITY_MARK gesendet: {message_bytes.hex(' ')}")
+
+            time.sleep(0.05)
+
+            # 3️⃣ Senden des Bytes "06" mit PARITY_SPACE
+            ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_SPACE, timeout=3)
+            ser.write(bytes.fromhex("06"))
+            ser.flush()
+            ser.close()
+            print(f"📤 Gesendet mit PARITY_SPACE: 06")
+
+            time.sleep(0.05)
+
+            # 4️⃣ Senden des letzten Bytes "03" mit PARITY_MARK
+            ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
+            ser.write(bytes.fromhex("03"))
+            ser.flush()
+            ser.close()
+            print(f"📤 Gesendet mit PARITY_MARK: 03")
+
         ser.close()
-        print(f"📤 Gesendet mit PARITY_MARK: 00 F9")
-
-        time.sleep(0.05)  # Kleiner Delay, um Umschaltung zu stabilisieren
-
-        # 1️⃣ Senden der ersten beiden Bytes "00 F9" mit PARITY_MARK
-        ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_SPACE, timeout=3)
-        ser.write(bytes.fromhex("06"))
-        ser.flush()
-        ser.close()
-        print(f"📤 Gesendet mit PARITY_MARK: 06")
-
-        time.sleep(0.05)  # Kleiner Delay, um Umschaltung zu stabilisieren
-
-        # 2️⃣ Senden der verarbeiteten Eingabe (inklusive CRC) mit PARITY_MARK
-        ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_SPACE, timeout=3)
-        ser.write(message_bytes)
-        ser.flush()
-        ser.close()
-        print(f"📤 Nachricht mit PARITY_MARK gesendet: {message_bytes.hex(' ')}")
-
-        time.sleep(0.05)
-
-        # 3️⃣ Senden des Bytes "06" mit PARITY_SPACE
-        ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_SPACE, timeout=3)
-        ser.write(bytes.fromhex("06"))
-        ser.flush()
-        ser.close()
-        print(f"📤 Gesendet mit PARITY_SPACE: 06")
-
-        time.sleep(0.05)
-
-        # 4️⃣ Senden des letzten Bytes "03" mit PARITY_MARK
-        ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
-        ser.write(bytes.fromhex("03"))
-        ser.flush()
-        ser.close()
-        print(f"📤 Gesendet mit PARITY_MARK: 03")
 
     except Exception as e:
         print(f"❌ Fehler beim Senden der Nachricht: {e}")
