@@ -646,7 +646,7 @@ def run():
                     continue
                 logger.debug("Start byte found, reading data...")
                 ret = ser.read(2)
-                if ret[0] != 0x00 or (ret[1] not in [0x14, 0xf1]):
+                if ret[0] != 0x00 or (ret[1] not in [0x14, 0xf1, 0xfa]):
                     logger.debug("Invalid start frame")
                     continue
                 if ret[1] == 0x14:
@@ -714,6 +714,10 @@ def run():
                             if value is not None:
                                 mqtt_topic = nibe_registers[reg]
                                 publish_mqtt(mqtt_topic, value)
+                if ret[1] == 0xfa:
+                    ack = ser.read(1)
+                    if ack[0] != 0x06:
+                        continue
                 #else:
                     #logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
             except Exception as e:
