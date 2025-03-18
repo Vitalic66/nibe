@@ -715,9 +715,7 @@ def run():
                                 mqtt_topic = nibe_registers[reg]
                                 publish_mqtt(mqtt_topic, value)
                 if ret[1] == 0xfa:
-                    ack = ser.read(1)
-                    if ack[0] != 0x06:
-                        continue
+                    ser.write(b"\x06")
                 #else:
                     #logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
             except Exception as e:
