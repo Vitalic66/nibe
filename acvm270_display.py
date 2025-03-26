@@ -736,53 +736,22 @@ def run():
                 #display
                 if ret[1] == 0xf9:
                     ack = ser.read(1)
-                    if not ack or ack[0] != 0x06:
-                        logger.debug("Kein Ack für 0xf9, Schleife fortsetzen.")
+                    if ack[0] != 0x06:
                         continue
                     frm = ser.read(4)
-                    if len(frm) < 4:
-                        logger.debug("Nicht genügend Daten für den Header im 0xf9 Frame.")
-                        continue
                     if frm[0] == 0x03:
-                        logger.debug("Frame beginnt mit 0x03, ignoriere diesen Frame.")
                         continue
                     l = int(frm[3])
-                    dl = frm[0]  # Identifier, z. B. 0x50, 0x51, ...
-                    extra = ser.read(l + 1)
-                    if len(extra) < l + 1:
-                        logger.debug("Nicht genügend Daten für die Payload im 0xf9 Frame.")
-                        continue
-                    frm += extra
+                    dl = frm[0] # 0x50 = Zeile 1 (Symbole), 0x51 = Zeile 2, 0x52 = Zeile 3, 0x53 = Zeile 4
+                    frm += ser.read(l + 1)
                     crc = 0
-                    for i in frm[:-1]:
+                    for i in frm[:-1]:          
                         crc ^= i
                     if crc != frm[-1]:
-                        logger.debug("CRC Fehler im 0xf9 Frame")
+                        logger.debug("Frame CRC error")
                         continue
-                    msg = frm[4:-2]  # Vorletztes Byte = Müll, letztes Byte = CRC
+                    msg = frm[4:-2] #letztes byte = müll
                     publish_ascii_message_with_subtopic(dl, msg)
-                    # Am Ende der Verarbeitung sofort den Puffer leeren, falls notwendig:
-                    ser.reset_input_buffer()
-                    continue 
-                
-                #if ret[1] == 0xf9:
-                    #ack = ser.read(1)
-                    #if ack[0] != 0x06:
-                        #continue
-                    #frm = ser.read(4)
-                    #if frm[0] == 0x03:
-                        #continue
-                    #l = int(frm[3])
-                    #dl = frm[0] # 0x50 = Zeile 1 (Symbole), 0x51 = Zeile 2, 0x52 = Zeile 3, 0x53 = Zeile 4
-                    #frm += ser.read(l + 1)
-                    #crc = 0
-                    #for i in frm[:-1]:          
-                        #crc ^= i
-                    #if crc != frm[-1]:
-                        #logger.debug("Frame CRC error")
-                        #continue
-                    #msg = frm[4:-2] #letztes byte = müll
-                    #publish_ascii_message_with_subtopic(dl, msg)
                 #else:
                     #logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
             except Exception as e:
