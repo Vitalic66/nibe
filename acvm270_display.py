@@ -630,23 +630,23 @@ def publish_ascii_message_with_subtopic(identifier: int, payload_bytes: bytes):
     Wandelt die übergebenen Payload-Bytes in einen ASCII-String um und publiziert diesen
     an ein bestimmtes MQTT-Subtopic, basierend auf dem übergebenen Identifier.
     """
-    try:
+    #try:
         # Bestimme das Subtopic basierend auf dem Identifier
-        if identifier == 0x51:
-            topic = "nibe/display/line2"
-        elif identifier == 0x52:
-            topic = "nibe/display/line3"
-        elif identifier == 0x53:
-            topic = "nibe/display/line4"
-        else:
-            topic = "nibe/display/unknown"
+    if identifier == 0x51:
+        topic = "nibe/display/line2"
+    elif identifier == 0x52:
+        topic = "nibe/display/line3"
+    elif identifier == 0x53:
+        topic = "nibe/display/line4"
+    else:
+        topic = "nibe/display/unknown"
         
         # Konvertiere die Bytes in einen ASCII-String
-        ascii_payload = payload_bytes.decode('ascii', errors='replace')
-        publish_mqtt(topic, ascii_payload)
-        logger.info(f"Published ASCII message '{ascii_payload}' to topic '{topic}'")
-    except Exception as e:
-        logger.error(f"Fehler beim Verarbeiten der ASCII-Nachricht: {e}")
+    ascii_payload = payload_bytes.decode('ascii', errors='replace')
+    publish_mqtt(topic, ascii_payload)
+    logger.info(f"Published ASCII message '{ascii_payload}' to topic '{topic}'")
+    #except Exception as e:
+        #logger.error(f"Fehler beim Verarbeiten der ASCII-Nachricht: {e}")
 
 def run():
     logger.info("Starting the main loop...")
