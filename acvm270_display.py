@@ -44,11 +44,11 @@ def publish_ascii_message_with_subtopic(identifier: int, payload_bytes: bytes):
             topic = "nibe/display/unknown"
         
         # Konvertiere die Bytes in einen ASCII-String
-    ascii_payload = payload_bytes.decode('ascii', errors='replace')
-    publish_mqtt(topic, ascii_payload)
-    logger.info(f"Published ASCII message '{ascii_payload}' to topic '{topic}'")
-    #except Exception as e:
-        #logger.error(f"Fehler beim Verarbeiten der ASCII-Nachricht: {e}")
+        ascii_payload = payload_bytes.decode('ascii', errors='replace')
+        publish_mqtt(topic, ascii_payload)
+        logger.info(f"Published ASCII message '{ascii_payload}' to topic '{topic}'")
+    except Exception as e:
+        logger.error(f"Fehler beim Verarbeiten der ASCII-Nachricht: {e}")
 
 def run():
     logger.info("Starting the main loop...")
