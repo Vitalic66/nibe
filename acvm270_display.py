@@ -72,6 +72,7 @@ def run():
                     continue
                 l = int(frm[3])
                 dl = frm[0] # 0x50 = Zeile 1 (Symbole), 0x51 = Zeile 2, 0x52 = Zeile 3, 0x53 = Zeile 4
+                logger.warning(f"displayline: {dl}")
                 frm += ser.read(l + 1)
                 crc = 0
                 for i in frm[:-1]:          
@@ -80,6 +81,7 @@ def run():
                     logger.debug("Frame CRC error")
                     continue
                 msg = frm[4:-2] #letztes byte = müll
+                logger.warning(f"msg: {msg}")
                 publish_ascii_message_with_subtopic(dl, msg)
             except Exception as e:
                 logger.warning(f"Error in Nibe data processing: {e}")
