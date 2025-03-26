@@ -13,7 +13,6 @@ logger = logging.getLogger('NIBE')
 mqtt_client = mqtt.Client()
 mqtt_client.reconnect_delay_set(min_delay=1, max_delay=60)
 mqtt_client.username_pw_set(username="", password="")
-#mqtt_client.will_set("nibe/status", "offline", retain=True)
 mqtt_client.connect("192.168.178.92", 1883, 60)
 
 def publish_mqtt(topic, message):
@@ -52,12 +51,6 @@ def publish_ascii_message_with_subtopic(identifier: int, payload_bytes: bytes):
 
 def run():
     logger.info("Starting the main loop...")
-
-    # Publish availability as "online" at the start of the script
-    publish_availability("online")
-
-    # Publish discovery payloads for all sensors
-    publish_discovery_payloads()
 
     mqtt_client.loop_start()
     try:
