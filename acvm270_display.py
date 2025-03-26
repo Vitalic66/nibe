@@ -63,7 +63,7 @@ def run():
                     continue
                 logger.debug("Start byte found, reading data...")
                 ret = ser.read(2)
-                if ret[0] != 0x00 and ret[1] != 0xf9 :
+                if ret[0] != 0x00 or ret[1] != 0xf9 :
                     logger.debug("Invalid start frame")
                     continue
                 ack = ser.read(1)
