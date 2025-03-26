@@ -9,6 +9,8 @@ from struct import unpack, pack
 logging.basicConfig(level=logging.WARNING, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('NIBE')
 
+last_display_time = 0  # Initialisierung außerhalb der while-Schleife
+
 # MQTT setup
 mqtt_client = mqtt.Client()
 mqtt_client.reconnect_delay_set(min_delay=1, max_delay=60)
@@ -735,6 +737,11 @@ def run():
                                 publish_mqtt(mqtt_topic, value)
                 #display
                 if ret[1] == 0xf9:
+                    current_time = time.time()
+                    if current_time - last_display_time < 1:
+                        # Noch nicht eine Sekunde vergangen – diesen Zweig überspringen
+                        continue
+                    last_display_time = current_time
                     ack = ser.read(1)
                     if ack[0] != 0x06:
                         continue
