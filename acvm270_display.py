@@ -750,10 +750,11 @@ def run():
                     if crc != frm[-1]:
                         logger.debug("Frame CRC error")
                         continue
-                    msg = frm[4:-1]
+                    msg = frm[4:-2] #vorletztes byte = müll, letztes byte = crc
                     #l = len(msg)
                     #if dl == 0x51:
                     publish_ascii_message_with_subtopic(dl, msg)
+                    break
                 #else:
                     #logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
             except Exception as e:
