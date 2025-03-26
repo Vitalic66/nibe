@@ -63,16 +63,18 @@ def run():
                     continue
                 logger.debug("Start byte found, reading data...")
                 ret = ser.read(2)
-                if ret[0] != 0x00 or ret[1] != 0xf9 :
+                if ret[0] != 0x00 and ret[1] != 0xf9 :
                     logger.debug("Invalid start frame")
                     continue
                 ack = ser.read(1)
-                if ack[0] != 0x06:
+                if not ack or ack[0] != 0x06:
                     continue
                 logger.debug(f"ack found : {ack}")
                 frm = ser.read(4)
                 if frm[0] == 0x03:
                     continue
+                if frm[2] != 0x59:
+                    continue        #ignore D4 message
                 l = int(frm[3])
                 dl = frm[0] # 0x50 = Zeile 1 (Symbole), 0x51 = Zeile 2, 0x52 = Zeile 3, 0x53 = Zeile 4
                 logger.debug(f"displayline: {dl}")
