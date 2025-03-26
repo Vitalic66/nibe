@@ -86,6 +86,8 @@ def run():
                 msg = frm[4:-1] #letztes byte = müll
                 logger.debug(f"msg: {msg}")
                 publish_ascii_message_with_subtopic(dl, msg)
+                ser.reset_input_buffer()
+                continue
             except Exception as e:
                 logger.debug(f"Error in Nibe data processing: {e}")
                 time.sleep(1)
