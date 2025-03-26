@@ -45,7 +45,7 @@ def publish_ascii_message_with_subtopic(identifier: int, payload_bytes: bytes):
         # Konvertiere die Bytes in einen ASCII-String
         ascii_payload = payload_bytes.decode('ascii', errors='replace')
         publish_mqtt(topic, ascii_payload)
-        logger.info(f"Published ASCII message '{ascii_payload}' to topic '{topic}'")
+        logger.debug(f"Published ASCII message '{ascii_payload}' to topic '{topic}'")
     except Exception as e:
         logger.error(f"Fehler beim Verarbeiten der ASCII-Nachricht: {e}")
 
@@ -67,13 +67,13 @@ def run():
                 ack = ser.read(1)
                 if ack[0] != 0x06:
                     continue
-                logger.warning(f"ack found : {ack}")
+                logger.debug(f"ack found : {ack}")
                 frm = ser.read(4)
                 if frm[0] == 0x03:
                     continue
                 l = int(frm[3])
                 dl = frm[0] # 0x50 = Zeile 1 (Symbole), 0x51 = Zeile 2, 0x52 = Zeile 3, 0x53 = Zeile 4
-                logger.warning(f"displayline: {dl}")
+                logger.debug(f"displayline: {dl}")
                 frm += ser.read(l + 1)
                 crc = 0
                 for i in frm[:-1]:          
@@ -82,10 +82,10 @@ def run():
                     logger.debug("Frame CRC error")
                     continue
                 msg = frm[4:-2] #letztes byte = müll
-                logger.warning(f"msg: {msg}")
+                logger.debug(f"msg: {msg}")
                 publish_ascii_message_with_subtopic(dl, msg)
             except Exception as e:
-                logger.warning(f"Error in Nibe data processing: {e}")
+                logger.debug(f"Error in Nibe data processing: {e}")
                 time.sleep(1)
     except KeyboardInterrupt:
         logger.info("Script interrupted, shutting down...")
