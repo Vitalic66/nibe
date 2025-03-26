@@ -67,6 +67,7 @@ def run():
                 ack = ser.read(1)
                 if ack[0] != 0x06:
                     continue
+                logger.warning(f"ack found : {ack}")
                 frm = ser.read(4)
                 if frm[0] == 0x03:
                     continue
