@@ -87,9 +87,22 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
             default:   topic = "nibe/display/unknown"; break;
         }
         char ascii_payload[256];
-        size_t len = payload_len < sizeof(ascii_payload) - 1 ? payload_len : sizeof(ascii_payload) - 1;
-        memcpy(ascii_payload, payload, len);
-        ascii_payload[len] = '\0';
+        size_t out_index = 0;
+        // Durchlaufe den Payload und konvertiere, falls 0xB0 vorkommt
+        for (size_t i = 0; i < payload_len && out_index < sizeof(ascii_payload) - 1; i++) {
+            if (payload[i] == 0xB0) {
+                // Ersetze 0xB0 durch UTF-8: 0xC2 0xB0, sofern genügend Platz im Puffer ist
+                if (out_index + 2 < sizeof(ascii_payload) - 1) {
+                    ascii_payload[out_index++] = 0xC2;
+                    ascii_payload[out_index++] = 0xB0;
+                } else {
+                    break; // Nicht genügend Platz, also abbrechen
+                }
+            } else {
+                ascii_payload[out_index++] = payload[i];
+            }
+        }
+        ascii_payload[out_index] = '\0';
         publish_mqtt(topic, ascii_payload);
         printf("Published ASCII message '%s' to topic '%s'\n", ascii_payload, topic);
     }
