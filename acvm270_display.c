@@ -70,21 +70,21 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
         // Erstelle einen JSON-String
         char json[256];
         snprintf(json, sizeof(json),
-                 "{\"verdichter\": %d, \"blitz\": %d, \"stufe1\": %d, \"stufe2\": %d, \"stufe3\": %d, \"wasserhahn\": %d, \"pumpe\": %d, \"heizung\": %d, \"tropen\": %d}",
-                 verdichter, blitz, stufe1, stufe2, stufe3, wasserhahn, pumpe, heizung, tropen);
+                 "{\"verdichter\": %d, \"blitz\": %d, \"stufe1\": %d, \"stufe2\": %d, \"stufe3\": %d, \"wasserhahn\": %d, \"pumpe\": %d, \"heizung\": %d, \"tropfen\": %d}",
+                 verdichter, blitz, stufe1, stufe2, stufe3, wasserhahn, pumpe, heizung, tropfen);
 
         // Für Identifier 0x50 verwenden wir z. B. das Topic "nibe_2/display/line1"
-        publish_mqtt("nibe_2/display/line1", json);
+        publish_mqtt("nibe/display/line1", json);
         printf("Published JSON message '%s' to topic '%s'\n", json, "nibe_2/display/line1");
     } else {
         // Für alle anderen Identifier: ASCII-Umwandlung wie bisher
         const char* topic;
         switch(identifier) {
-            case 0x50: topic = "nibe_2/display/line1"; break;
-            case 0x51: topic = "nibe_2/display/line2"; break;
-            case 0x52: topic = "nibe_2/display/line3"; break;
-            case 0x53: topic = "nibe_2/display/line4"; break;
-            default:   topic = "nibe_2/display/unknown"; break;
+            case 0x50: topic = "nibe/display/line1"; break;
+            case 0x51: topic = "nibe/display/line2"; break;
+            case 0x52: topic = "nibe/display/line3"; break;
+            case 0x53: topic = "nibe/display/line4"; break;
+            default:   topic = "nibe/display/unknown"; break;
         }
         char ascii_payload[256];
         size_t len = payload_len < sizeof(ascii_payload) - 1 ? payload_len : sizeof(ascii_payload) - 1;
