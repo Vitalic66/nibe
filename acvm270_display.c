@@ -53,6 +53,7 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
         //   Bit7 (0x02): Stufe 2
         //   Bit8 (0x01): Stufe 3
         int verdichter = (payload[0] & 0x80) ? 1 : 0;
+        int byte1_A    = (payload[0] & 0x40) ? 1 : 0;
         int blitz      = (payload[0] & 0x08) ? 1 : 0;
         int stufe1     = (payload[0] & 0x04) ? 1 : 0;
         int stufe2     = (payload[0] & 0x02) ? 1 : 0;
@@ -61,6 +62,7 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
         // Byte 2 (payload[1]):
         //   Bit1 (0x80): Wasserhahn
         int wasserhahn = (payload[1] & 0x80) ? 1 : 0;
+        int byte2_A    = (payload[1] & 0x40) ? 1 : 0;
 
         // Byte 3 (payload[2]):
         //   Bit1 (0x80): Pumpe
@@ -68,17 +70,17 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
         //   Bit8 (0x01): Tropfen
         int pumpe   = (payload[2] & 0x80) ? 1 : 0;
         int heizung = (payload[2] & 0x08) ? 1 : 0;
-        int tropfen  = (payload[2] & 0x01) ? 1 : 0;
+        int tropfen = (payload[2] & 0x01) ? 1 : 0;
 
         // Erstelle einen JSON-String
         char json[256];
         snprintf(json, sizeof(json),
-                 "{\"verdichter\": %d, \"blitz\": %d, \"stufe1\": %d, \"stufe2\": %d, \"stufe3\": %d, \"wasserhahn\": %d, \"pumpe\": %d, \"heizung\": %d, \"tropfen\": %d}",
-                 verdichter, blitz, stufe1, stufe2, stufe3, wasserhahn, pumpe, heizung, tropfen);
+                 "{\"verdichter\": %d, \"byte1_A\": %d, \"blitz\": %d, \"stufe1\": %d, \"stufe2\": %d, \"stufe3\": %d, \"wasserhahn\": %d, \"byte2_A\": %d, \"pumpe\": %d, \"heizung\": %d, \"tropfen\": %d}",
+                 verdichter, byte1_A, blitz, stufe1, stufe2, stufe3, wasserhahn, byte2_A, pumpe, heizung, tropfen);
 
         // Für Identifier 0x50 verwenden wir z. B. das Topic "nibe_2/display/line1"
         publish_mqtt("nibe/display/line1", json);
-        printf("Published JSON message '%s' to topic '%s'\n", json, "nibe_2/display/line1");
+        printf("Published JSON message '%s' to topic '%s'\n", json, "nibe/display/line1");
     } else if (identifier == 0x53) {
         // Zunächst Payload in einen nullterminierten String kopieren (maximal 255 Zeichen)
         char temp[256];
