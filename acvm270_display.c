@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <ctype.h>
 
 #include <ftdi.h>
 #include "MQTTClient.h"
@@ -12,17 +13,19 @@
 #define CLIENTID        "NibeDisplayClient"
 #define QOS             1
 #define TIMEOUT         10000L
+#define BUFFER_SIZE     1024
 
 // Global MQTT client handle
 MQTTClient client;
 
 /* Publiziert eine MQTT-Nachricht an das angegebene Topic */
 void publish_mqtt(const char* topic, const char* message) {
-    // Prüfe, ob die Nachricht leer ist
+    /*
     if (message == NULL || strlen(message) == 0) {
         printf("Leere Nachricht – nicht publizieren.\n");
         return;
     }
+    */
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
     MQTTClient_deliveryToken token;
     pubmsg.payload = (void*)message;
@@ -76,32 +79,105 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
         // Für Identifier 0x50 verwenden wir z. B. das Topic "nibe_2/display/line1"
         publish_mqtt("nibe/display/line1", json);
         printf("Published JSON message '%s' to topic '%s'\n", json, "nibe_2/display/line1");
+    } else if (identifier == 0x53) {
+        // Zunächst Payload in einen nullterminierten String kopieren (maximal 255 Zeichen)
+        char temp[256];
+        size_t len = payload_len < sizeof(temp) - 1 ? payload_len : sizeof(temp) - 1;
+        memcpy(temp, payload, len);
+        temp[len] = '\0';
+        
+        // Suche nach dem ersten Leerzeichen, das als Trenner dient
+        char *first_token = temp;
+        // Überspringe führende Leerzeichen (falls vorhanden)
+        while (*first_token && isspace((unsigned char)*first_token)) {
+            first_token++;
+        }
+        char *p = first_token;
+        // Finde das Ende des ersten Tokens (erstes Leerzeichen)
+        while (*p && !isspace((unsigned char)*p)) {
+            p++;
+        }
+        if (*p) {
+            *p = '\0';  // Token beenden
+            p++;        // Starte zweiten Token
+        }
+        // Überspringe etwaige Leerzeichen vor dem zweiten Token
+        while (*p && isspace((unsigned char)*p)) {
+            p++;
+        }
+        char *second_token = p;
+        
+        // Entferne innerhalb beider Tokens alle Leerzeichen
+        char token1[256] = {0}, token2[256] = {0};
+        size_t j = 0;
+        for (char *s = first_token; *s; s++) {
+            if (!isspace((unsigned char)*s)) {
+                token1[j++] = *s;
+            }
+        }
+        token1[j] = '\0';
+        j = 0;
+        for (char *s = second_token; *s; s++) {
+            if (!isspace((unsigned char)*s)) {
+                token2[j++] = *s;
+            }
+        }
+        token2[j] = '\0';
+        
+        // Sende die beiden Teilstrings an unterschiedliche Topics
+        publish_mqtt("nibe/display/line4a", token1);
+        publish_mqtt("nibe/display/line4b", token2);
+        printf("Published split messages: '%s' to nibe/display/line4a and '%s' to nibe/display/line4b\n", token1, token2);      
     } else {
         // Für alle anderen Identifier: ASCII-Umwandlung wie bisher
         const char* topic;
         switch(identifier) {
-            case 0x50: topic = "nibe/display/line1"; break;
+            //case 0x50: topic = "nibe/display/line1"; break;
             case 0x51: topic = "nibe/display/line2"; break;
             case 0x52: topic = "nibe/display/line3"; break;
-            case 0x53: topic = "nibe/display/line4"; break;
+            //case 0x53: topic = "nibe/display/line4"; break;
             default:   topic = "nibe/display/unknown"; break;
         }
         char ascii_payload[256];
         size_t out_index = 0;
         // Durchlaufe den Payload und konvertiere, falls 0xB0 vorkommt
         for (size_t i = 0; i < payload_len && out_index < sizeof(ascii_payload) - 1; i++) {
-            if (payload[i] == 0xB0) {
-                // Ersetze 0xB0 durch UTF-8: 0xC2 0xB0, sofern genügend Platz im Puffer ist
-                if (out_index + 2 < sizeof(ascii_payload) - 1) {
-                    ascii_payload[out_index++] = 0xC2;
-                    ascii_payload[out_index++] = 0xB0;
-                } else {
-                    break; // Nicht genügend Platz, also abbrechen
-                }
-            } else {
-                ascii_payload[out_index++] = payload[i];
-            }
+            switch (payload[i]) {
+                case 0xB0:
+                    if (out_index + 2 < sizeof(ascii_payload) - 1) {
+                        ascii_payload[out_index++] = 0xC2;
+                        ascii_payload[out_index++] = 0xB0;
+                    }
+                    break;
+                case 0xDF: // ß
+                    if (out_index + 2 < sizeof(ascii_payload) - 1) {
+                        ascii_payload[out_index++] = 0xC3;
+                        ascii_payload[out_index++] = 0x9F;
+                    }
+                    break;
+                case 0xE4: // ä
+                    if (out_index + 2 < sizeof(ascii_payload) - 1) {
+                        ascii_payload[out_index++] = 0xC3;
+                        ascii_payload[out_index++] = 0xA4;
+                    }
+                    break;
+                case 0xFC: // ü
+                    if (out_index + 2 < sizeof(ascii_payload) - 1) {
+                        ascii_payload[out_index++] = 0xC3;
+                        ascii_payload[out_index++] = 0xBC;
+                    }
+                    break;
+                case 0xF6: // ö
+                    if (out_index + 2 < sizeof(ascii_payload) - 1) {
+                        ascii_payload[out_index++] = 0xC3;
+                        ascii_payload[out_index++] = 0xB6;
+                    }
+                    break;
+                default:
+                    ascii_payload[out_index++] = payload[i];
+                    break;
         }
+    }
         ascii_payload[out_index] = '\0';
         publish_mqtt(topic, ascii_payload);
         printf("Published ASCII message '%s' to topic '%s'\n", ascii_payload, topic);
@@ -110,8 +186,7 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
 
 int main(void) {
     int ret;
-    struct ftdi_context *ftdi;
-    ftdi = ftdi_new();
+    struct ftdi_context *ftdi = ftdi_new();
     if (ftdi == NULL) {
         fprintf(stderr, "ftdi_new failed\n");
         return EXIT_FAILURE;
@@ -162,7 +237,6 @@ int main(void) {
     }
     ftdi_list_free(&devlist);
 
-    // Setze Baudrate auf 19200
     ret = ftdi_set_baudrate(ftdi, 19200);
     if (ret < 0) {
         fprintf(stderr, "Unable to set baudrate: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
@@ -171,7 +245,7 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    // Setze 8 Datenbits, 1 Stoppbit und Space-Parität (statt NONE)
+    // Setze 8 Datenbits, 1 Stoppbit und Space-Parität erzwingen
     ret = ftdi_set_line_property(ftdi, BITS_8, STOP_BIT_1, SPACE);
     if (ret < 0) {
         fprintf(stderr, "Unable to set line properties: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
@@ -180,12 +254,9 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    // Setze einen Lese-Timeout (in Millisekunden)
     ftdi->usb_read_timeout = 3000;
-
     printf("FTDI device opened successfully.\n");
 
-    // MQTT-Verbindung initialisieren und herstellen
     MQTTClient_create(&client, MQTT_ADDRESS, CLIENTID,
                       MQTTCLIENT_PERSISTENCE_NONE, NULL);
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
@@ -201,91 +272,61 @@ int main(void) {
     }
     printf("Connected to MQTT broker at %s.\n", MQTT_ADDRESS);
 
-    /* Hauptschleife:
-       Suche die Startsequenz mittels eines Sliding Windows.
-       Gesucht wird das Muster: 0x00, 0xF9, 0x06, XX   (XX muss 0x50, 0x51, 0x52 oder 0x53 sein)
-    */
+    // Pufferbasierte Verarbeitung
+    uint8_t buffer[BUFFER_SIZE];
+    size_t buffer_len = 0;
+
     while (1) {
-        uint8_t window[4] = {0};
-        int count = 0;
-        // Fülle zuerst das Fenster mit 4 Bytes (falls möglich)
-        while (count < 4) {
-            ret = ftdi_read_data(ftdi, &window[count], 1);
-            if (ret < 1) {
-                usleep(100000);
-                continue;
-            }
-            count++;
-        }
-        // Jetzt suche im kontinuierlichen Stream das Muster
-        while (1) {
-            if (window[0] == 0x00 && window[1] == 0xF9 && window[2] == 0x06 &&
-                (window[3] == 0x50 || window[3] == 0x51 || window[3] == 0x52 || window[3] == 0x53)) {
-                break;  // Startsequenz gefunden
-            }
-            // Verschiebe das Fenster um ein Byte: window[0] <- window[1], window[1] <- window[2], etc.
-            window[0] = window[1];
-            window[1] = window[2];
-            window[2] = window[3];
-            ret = ftdi_read_data(ftdi, &window[3], 1);
-            if (ret < 1) {
-                usleep(100000);
-                continue;
+        // Lese verfügbare Daten in den Puffer
+        if (buffer_len < BUFFER_SIZE) {
+            ret = ftdi_read_data(ftdi, buffer + buffer_len, BUFFER_SIZE - buffer_len);
+            if (ret > 0) {
+                buffer_len += ret;
             }
         }
-        uint8_t identifier = window[3];
-        printf("Start sequence found with identifier 0x%02X\n", identifier);
+        // Suche im Puffer nach gültigen Startsequenzen
+        size_t pos = 0;
+        while (pos + 7 <= buffer_len) { // mindestens 7 Bytes für Startseq + Extra
+            if (buffer[pos] == 0x00 && buffer[pos+1] == 0xF9 &&
+                buffer[pos+2] == 0x06 &&
+                (buffer[pos+3] == 0x50 || buffer[pos+3] == 0x51 ||
+                 buffer[pos+3] == 0x52 || buffer[pos+3] == 0x53)) {
+                // Stelle sicher, dass 3 Extra-Bytes vorhanden sind
+                if (pos + 7 > buffer_len)
+                    break;
+                uint8_t msg_length = buffer[pos+6]; // drittes Extra-Byte
+                size_t total_msg_len = 4 + 3 + (msg_length + 1);
+                if (pos + total_msg_len > buffer_len)
+                    break; // vollständiger Frame noch nicht verfügbar
 
-        // Lese 3 weitere Bytes
-        uint8_t extra[3];
-        ret = ftdi_read_data(ftdi, extra, 3);
-        if (ret < 3) {
-            printf("Failed to read 3 extra bytes.\n");
-            continue;
+                // Berechne CRC: Identifier (buffer[pos+3]), Extra-Bytes (pos+4, pos+5, pos+6) und Payload
+                uint8_t computed_crc = 0;
+                computed_crc ^= buffer[pos+3];
+                computed_crc ^= buffer[pos+4];
+                computed_crc ^= buffer[pos+5];
+                computed_crc ^= buffer[pos+6];
+                for (size_t i = pos+7; i < pos+7+msg_length; i++) {
+                    computed_crc ^= buffer[i];
+                }
+                uint8_t reported_crc = buffer[pos+7+msg_length];
+                if (computed_crc == reported_crc) {
+                    publish_ascii_message_with_subtopic(buffer[pos+3], buffer + pos + 7, msg_length);
+                } else {
+                    printf("CRC error: computed 0x%02X, reported 0x%02X\n", computed_crc, reported_crc);
+                }
+                pos += total_msg_len;
+            } else {
+                pos++;
+            }
         }
-        // Das dritte Extra-Byte bestimmt die Länge der Payload
-        uint8_t msg_length = extra[2];
-        printf("Message length determined: %d bytes\n", msg_length);
-
-        // Lese anschliessend (msg_length + 1) Bytes: Payload plus gemeldeter CRC
-        size_t payload_block_len = msg_length + 1;
-        uint8_t *payload_block = malloc(payload_block_len);
-        if (!payload_block) {
-            fprintf(stderr, "Memory allocation error\n");
-            continue;
+        // Verschiebe unvollständige Daten an den Anfang des Puffers
+        if (pos > 0) {
+            memmove(buffer, buffer + pos, buffer_len - pos);
+            buffer_len -= pos;
         }
-        ret = ftdi_read_data(ftdi, payload_block, payload_block_len);
-        if (ret < payload_block_len) {
-            printf("Failed to read payload block (expected %zu, got %d)\n", payload_block_len, ret);
-            free(payload_block);
-            continue;
-        }
-        // CRC-Berechnung: aus dem Identifier (aus dem Startfenster), den 3 Extra-Bytes und den Payload-Bytes (ohne letztes Byte)
-        uint8_t computed_crc = 0;
-        computed_crc ^= identifier;
-        for (int i = 0; i < 3; i++) {
-            computed_crc ^= extra[i];
-        }
-        for (size_t i = 0; i < msg_length; i++) {
-            computed_crc ^= payload_block[i];
-        }
-        uint8_t reported_crc = payload_block[msg_length];
-        if (computed_crc != reported_crc) {
-            printf("CRC error: computed 0x%02X, expected 0x%02X\n", computed_crc, reported_crc);
-            free(payload_block);
-            continue;
-        }
-        printf("CRC check passed.\n");
-
-        // Die Payload ist payload_block[0 .. msg_length-1]
-        publish_ascii_message_with_subtopic(identifier, payload_block, msg_length);
-        free(payload_block);
-
-        // Optional: Empfangspuffer leeren
-        ftdi_usb_purge_rx_buffer(ftdi);
+        usleep(10000);
     }
 
-    // Aufräumen
     MQTTClient_disconnect(client, 10000);
     MQTTClient_destroy(&client);
     ftdi_usb_close(ftdi);
