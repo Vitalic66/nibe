@@ -1,0 +1,94 @@
+type: picture-elements
+elements:
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_pumpengeschwindigkeit
+    style:
+      left: 50.5%
+      top: 46%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_brauchwasser_oben
+    style:
+      left: 50%
+      top: 58.5%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_brauchwasser_unten
+    style:
+      left: 50%
+      top: 87%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.acvm_270_bw_temperatur
+    style:
+      left: 32%
+      top: 5%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_verd_temp_tho_r1
+    style:
+      left: 5%
+      top: 72%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_verd_temp_tho_r2
+    style:
+      left: 5%
+      top: 90%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_heissgastemp_tho_d
+    style:
+      left: 22%
+      top: 72%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_sauggastemp_tho_s
+    style:
+      left: 12.5%
+      top: 72%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_invertertemp_tho_ip
+    style:
+      left: 33%
+      top: 47%
+      font-size: 9px
+  - type: state-label
+    style:
+      left: 52%
+      top: 41%
+      font-size: 9px
+    entity: sensor.nibe_acvm_270_split_kondensator_aus_max
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_atemp_am_ams_tho_a
+    style:
+      left: 5%
+      top: 68%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_vorlauf_ist
+    style:
+      left: 51%
+      top: 27%
+      font-size: 9px
+  - type: state-label
+    entity: sensor.nibe_acvm_270_split_rucklauf
+    style:
+      left: 63%
+      top: 27%
+      font-size: 9px
+  - type: state-label
+    style:
+      left: 5%
+      top: 54%
+      font-size: 9px
+    entity: sensor.nibe_acvm_270_split_aussentemperatur
+  - type: state-label
+    entity: sensor.acvm_270_ofentank_temperatur
+    style:
+      left: 79.5%
+      top: 58.5%
+      font-size: 9px
+image: /api/image/serve/860d87941f301c8e95c71a63ffcf4cb8/512x512
+dark_mode_image: /api/image/serve/c70178109a5563c502823c7ed62a48af/512x512
