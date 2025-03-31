@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -87,7 +88,7 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
         size_t len = payload_len < sizeof(temp) - 1 ? payload_len : sizeof(temp) - 1;
         memcpy(temp, payload, len);
         temp[len] = '\0';
-        
+
         // Suche nach dem ersten Leerzeichen, das als Trenner dient
         char *first_token = temp;
         // Überspringe führende Leerzeichen (falls vorhanden)
@@ -108,7 +109,7 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
             p++;
         }
         char *second_token = p;
-        
+
         // Entferne innerhalb beider Tokens alle Leerzeichen
         char token1[256] = {0}, token2[256] = {0};
         size_t j = 0;
@@ -125,11 +126,11 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
             }
         }
         token2[j] = '\0';
-        
+
         // Sende die beiden Teilstrings an unterschiedliche Topics
         publish_mqtt("nibe/display/line4a", token1);
         publish_mqtt("nibe/display/line4b", token2);
-        printf("Published split messages: '%s' to nibe/display/line4a and '%s' to nibe/display/line4b\n", token1, token2);      
+        printf("Published split messages: '%s' to nibe/display/line4a and '%s' to nibe/display/line4b\n", token1, token2);
     } else {
         // Für alle anderen Identifier: ASCII-Umwandlung wie bisher
         const char* topic;
