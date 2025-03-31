@@ -123,8 +123,8 @@ elements:
         style:
           left: 32%
           top: 25%
-          transform: scale(1.8,2.2)
-        icon: mdi:flash
+          transform: scale(1.5,1.5)
+        icon: custom:lightning_bl
   - type: conditional
     title: Symbol Brauchwasser
     conditions:
@@ -177,6 +177,22 @@ elements:
           top: 25%
           transform: scale(1.8,2)
         icon: custom:defrost_bl
+  - type: icon
+    style:
+      left: 5%
+      top: 15%
+      transform: scale(2.2,2.2)
+    icon: custom:mode_bl
+    tap_action:
+      action: perform-action
+      perform_action: mqtt.publish
+      target: {}
+      data:
+        qos: "2"
+        topic: nibe/key
+        payload: "8"
+    hold_action:
+      action: none
   - type: icon
     style:
       left: 5%
