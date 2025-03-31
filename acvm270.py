@@ -27,17 +27,18 @@ def publish_availability(status):
 
 # Serial connection to Nibe heat pump (adjust COM port for Windows)
 serial_port = "/dev/ttyUSB0"  # Adjust to your correct COM port
-ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_NONE, timeout=3)
+#serial_port = "/dev/serial/by-id/usb-WCH.CN_USB_Quad_Serial_BC0449ABCD-if02"
+ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
 
 logger.debug("Serial port opened successfully")
 
 # Register mapping, expanded to match original script
 nibe_registers = {
     0: "nibe/cpu_id",
-    1: "nibe/outdoor_temp_c",  
+    1: "nibe/outdoor_temp_c",
     4: "nibe/heating_curve",
-    5: "nibe/flow_setpoint_c",  
-    6: "nibe/flow_actual_c",  
+    5: "nibe/flow_setpoint_c",
+    6: "nibe/flow_actual_c",
     7: "nibe/return_temp_c",
     8: "nibe/degree_minutes",
     12: "nibe/domestic_hot_water_top_temp",
@@ -88,7 +89,7 @@ nibe_registers = {
     131: "nibe/8b_temp3",
     135: "nibe/8b_temp4",
 }
-  
+
 
 # Define unique IDs and MQTT discovery configurations for each sensor
 mqtt_discovery_sensors = {
@@ -171,7 +172,7 @@ mqtt_discovery_sensors = {
         "unit_of_measurement": "°C",
         "device_class": "temperature",
         "unique_id": "nibe_resp_at_ams_tho_a"
-    },     
+    },
     "nibe/heating_curve": {
         "name": "Heizkurvenverschiebung",
         "state_topic": "nibe/heating_curve",
@@ -452,7 +453,7 @@ mqtt_discovery_sensors = {
 def publish_discovery_payloads():
     for sensor, config in mqtt_discovery_sensors.items():
         discovery_topic = f"homeassistant/sensor/{config['unique_id']}/config"
-        
+
         # Build the base payload
         payload = {
             "name": config["name"],
@@ -489,7 +490,7 @@ reg30_value = None
 
 def _decode(reg, raw):
     global reg28_value, reg29_value, reg30_value  # Ensure these variables are accessible
-    
+
     if len(raw) == 2:
         value = unpack('>H', raw)[0]
     else:
@@ -597,15 +598,15 @@ def _decode(reg, raw):
     if reg in [9, 10, 19, 22, 24]:
         logger.debug(f"Register {reg} (frequency/pressure) value: {value}")
         return float(value / 10)
-        
-    # Low pressure return value + 30    
+
+    # Low pressure return value + 30
     if reg == 20:
         logger.debug(f"Register {reg} (temperature/flow) value: {value}")
         if value > 100:
-            return float((unpack('h', pack('H', value))[0] / 10) - 30)        
+            return float((unpack('h', pack('H', value))[0] / 10) - 30)
         else:
             return float(unpack('h', pack('H', value))[0] / 10)
-    
+
     # Handle hysteresis and BW registers
     if reg in [40, 47]:
         logger.debug(f"Register {reg} (hysteresis/BW reg) value: {value}")
@@ -646,13 +647,13 @@ def run():
                     continue
                 logger.debug("Start byte found, reading data...")
                 ret = ser.read(2)
-                if ret[0] != 0x00 or (ret[1] not in [0x14, 0xf1, 0xfa]):
+                if ret[0] != 0x00 or (ret[1] not in [0x14, 0xf1]):
                     logger.debug("Invalid start frame")
                     continue
                 if ret[1] == 0x14:
                     ser.write(b"\x06")
                     frm = ser.read(4)
-                    if frm[0] == 0x03: 
+                    if frm[0] == 0x03:
                         continue
                     l = int(frm[3])
                     frm += ser.read(l + 1)
@@ -679,43 +680,6 @@ def run():
                             if value is not None:
                                 mqtt_topic = nibe_registers[reg]
                                 publish_mqtt(mqtt_topic, value)
-                #ret = ser.read(3)
-                #elif ret[1] == 0xf1:
-                if ret[1] == 0xf1:
-                    ack = ser.read(1)
-                    if ack[0] != 0x06:
-                        continue
-                    logger.debug("8888888888888888888888888888888888888888888888888888888888888888bbbbbbbbbbbbbbb")
-                    frm = ser.read(4)
-                    if frm[0] == 0x03:     #Falls das erste Byte der empfangenen Nachricht wieder 0x03 ist, wird sie ignoriert. Das passiert am Ende der Nachricht (03 00).
-                        continue
-                    l = int(frm[3])
-                    frm += ser.read(l + 1)
-                    crc = 0
-                    for i in frm[:-1]:          
-                        crc ^= i
-                    if crc != frm[-1]:
-                        logger.debug("Frame CRC error 8888888888888888888888888888888888888888888888888888bbbbbbbbbbbbbbb")
-                        continue
-                    msg = frm[4:-1]
-                    l = len(msg)
-                    i = 4
-                    while i <= l:
-                        reg = msg[i - 4]  # Fix: Korrekte Register-Indexierung
-                        if i != l and (msg[i - 1] == 0x00 or i == (l - 1)):
-                            #raw = bytes([msg[i - 3] // 16, msg[i - 2]])  # Fix: Richtige Byte-Kombination
-                            raw = bytes([(msg[i - 3] >> 4) | (msg[i - 3] & 0x0F), msg[i - 2]])
-                            i += 4
-                        else:
-                            raw = bytes([msg[i - 2]])
-                            i += 3
-                        if reg in nibe_registers:
-                            value = _decode(reg, raw)
-                            if value is not None:
-                                mqtt_topic = nibe_registers[reg]
-                                publish_mqtt(mqtt_topic, value)
-                if ret[1] == 0xfa:
-                    ser.write(b"\x06")
                 #else:
                     #logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
             except Exception as e:
