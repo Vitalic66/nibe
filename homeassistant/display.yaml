@@ -1,0 +1,261 @@
+type: picture-elements
+card_mod:
+  style: |
+    ha-card {
+      color: black;
+      font-family: LEDCalculator;
+    }
+elements:
+  - type: state-label
+    entity: sensor.acvm_270_display_zeile_2
+    style:
+      top: 52%
+      left: 50%
+      font-size: 38px
+      //transform: none
+  - type: state-label
+    entity: sensor.acvm_270_display_zeile_3
+    style:
+      top: 60%
+      left: 15%
+      font-size: 25px
+      transform: none
+  - type: state-label
+    entity: sensor.acvm_270_display_zeile_4a
+    style:
+      top: 75%
+      left: 15%
+      font-size: 25px
+      transform: none
+  - type: state-label
+    entity: sensor.acvm_270_display_zeile_4b
+    style:
+      top: 75%
+      left: 65%
+      font-size: 25px
+      transform: none
+  - type: conditional
+    title: Symbol Byte1 A
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_byte1_a
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 18%
+          top: 10%
+          transform: scale(1.2,1.2)
+        icon: mdi:alpha-a
+  - type: conditional
+    title: Symbol Stufe 1
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_stufe_1
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 28%
+          top: 10%
+          transform: scale(1.2,1.2)
+        icon: mdi:roman-numeral-1
+  - type: conditional
+    title: Symbol Stufe 2
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_stufe_2
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 31%
+          top: 10%
+          transform: scale(1.2,1.2)
+        icon: mdi:roman-numeral-2
+  - type: conditional
+    title: Symbol Stufe 3
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_stufe_3
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 35%
+          top: 10%
+          transform: scale(1.2,1.2)
+        icon: mdi:roman-numeral-3
+  - type: conditional
+    title: Symbol Byte2 A
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_byte2_a
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 40%
+          top: 10%
+          transform: scale(1.2,1.2)
+        icon: mdi:alpha-a
+  - type: conditional
+    title: Symbol Verdichter
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_verdichter
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 20%
+          top: 25%
+          transform: scale(1.8,1.8)
+        icon: custom:compressor_bl
+  - type: conditional
+    title: Symbol Heizstab
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_heizstab
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 32%
+          top: 25%
+          transform: scale(1.8,2.2)
+        icon: mdi:flash
+  - type: conditional
+    title: Symbol Brauchwasser
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_brauchwasser
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 42%
+          top: 25%
+          transform: scale(1.8,2.1)
+        icon: mdi:faucet
+  - type: conditional
+    title: Symbol Pumpe
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_pumpe
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 52%
+          top: 25%
+          transform: scale(1.8,1.8)
+        icon: custom:pump_bl
+  - type: conditional
+    title: Symbol Heizung
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_heizung
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 65%
+          top: 25%
+          transform: scale(1.8,1.4)
+        icon: custom:radiator_bl
+  - type: conditional
+    title: Symbol Defrost
+    conditions:
+      - condition: state
+        entity: sensor.acvm_270_display_zeile_1_defrost
+        state: "1"
+    elements:
+      - type: icon
+        style:
+          left: 75%
+          top: 25%
+          transform: scale(1.8,2)
+        icon: custom:defrost_bl
+  - type: icon
+    style:
+      left: 5%
+      top: 47%
+      transform: scale(2.5,2.5)
+    icon: mdi:faucet
+    tap_action:
+      action: perform-action
+      perform_action: mqtt.publish
+      target: {}
+      data:
+        qos: "2"
+        topic: nibe/key
+        payload: "10"
+    hold_action:
+      action: none
+  - type: icon
+    style:
+      left: 5%
+      top: 77%
+      transform: scale(2.5,2.5)
+    icon: mdi:home
+    tap_action:
+      action: perform-action
+      perform_action: mqtt.publish
+      target: {}
+      data:
+        qos: "2"
+        topic: nibe/key
+        payload: "20"
+    hold_action:
+      action: none
+  - type: icon
+    style:
+      left: 90%
+      top: 15%
+      transform: scale(2.5,2.5)
+    icon: mdi:plus-circle
+    tap_action:
+      action: perform-action
+      perform_action: mqtt.publish
+      target: {}
+      data:
+        qos: "2"
+        topic: nibe/key
+        payload: "1"
+    hold_action:
+      action: none
+  - type: icon
+    style:
+      left: 90%
+      top: 47%
+      transform: scale(2.5,2.5)
+    icon: mdi:minus-circle
+    tap_action:
+      action: perform-action
+      perform_action: mqtt.publish
+      target: {}
+      data:
+        qos: "2"
+        topic: nibe/key
+        payload: "2"
+    hold_action:
+      action: none
+  - type: icon
+    style:
+      left: 90%
+      top: 77%
+      transform: scale(2.5,2.5)
+    icon: mdi:location-enter
+    tap_action:
+      action: perform-action
+      perform_action: mqtt.publish
+      target: {}
+      data:
+        qos: "2"
+        topic: nibe/key
+        payload: "4"
+    hold_action:
+      action: none
+image: /api/image/serve/50465e55fd83f223a7f07d15e362d7df/512x512
+dark_mode_image: /api/image/serve/b02ceb061f88f09ebad2b561e3c403cb/512x512
