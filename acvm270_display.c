@@ -4,11 +4,15 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <time.h>
+//#include <time.h>
 #include <ctype.h>
 
-#include <ftdi.h>
+//#include <ftdi.h>
 #include "MQTTClient.h"
+
+#include <termios.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #define MQTT_ADDRESS    "tcp://192.168.178.92:1883"
 #define CLIENTID        "NibeDisplayClient"
@@ -188,7 +192,10 @@ void publish_ascii_message_with_subtopic(uint8_t identifier, uint8_t* payload, s
 }
 
 int main(void) {
+    
     int ret;
+
+    /*
     struct ftdi_context *ftdi = ftdi_new();
     if (ftdi == NULL) {
         fprintf(stderr, "ftdi_new failed\n");
@@ -265,7 +272,7 @@ int main(void) {
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     conn_opts.keepAliveInterval = 20;
     conn_opts.cleansession = 1;
-
+    */
     /*
     ret = MQTTClient_connect(client, &conn_opts);
     if (ret != MQTTCLIENT_SUCCESS) {
@@ -278,6 +285,14 @@ int main(void) {
     printf("Connected to MQTT broker at %s.\n", MQTT_ADDRESS);
     */
 
+    // MQTT setup
+    MQTTClient_create(&client, MQTT_ADDRESS, CLIENTID,
+                      MQTTCLIENT_PERSISTENCE_NONE, NULL);
+    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+    conn_opts.keepAliveInterval = 20;
+    conn_opts.cleansession = 1;
+
+    // Retry-Loop für MQTT-Verbindung
     int attempts = 0;
     while ((ret = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS) {
         printf("Failed to connect to MQTT broker, return code %d. Retrying in 5 seconds...\n", ret);
@@ -291,6 +306,48 @@ int main(void) {
         }
     }
     printf("Connected to MQTT broker at %s.\n", MQTT_ADDRESS);
+
+    // Open /dev/ttyUSB1
+    int serial_fd = open("/dev/ttyUSB1", O_RDWR | O_NOCTTY | O_SYNC);
+    if (serial_fd < 0) {
+        perror("Error opening /dev/ttyUSB1");
+        MQTTClient_destroy(&client);
+        return EXIT_FAILURE;
+    }
+
+    // Configure serial port
+    struct termios tty;
+    memset(&tty, 0, sizeof tty);
+    if (tcgetattr(serial_fd, &tty) != 0) {
+        perror("tcgetattr failed");
+        close(serial_fd);
+        MQTTClient_destroy(&client);
+        return EXIT_FAILURE;
+    }
+
+    cfsetospeed(&tty, B19200);
+    cfsetispeed(&tty, B19200);
+
+    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+    tty.c_iflag &= ~IGNBRK;                         // disable break processing
+    tty.c_lflag = 0;                                // no signaling chars, no echo
+    tty.c_oflag = 0;                                // no remapping, no delays
+    tty.c_cc[VMIN]  = 1;                            // read blocks for at least 1 char
+    tty.c_cc[VTIME] = 0;                            // no timeout
+
+    tty.c_cflag |= (CLOCAL | CREAD);                // ignore modem controls, enable reading
+    tty.c_cflag &= ~(PARENB | PARODD);              // clear parity bit
+    tty.c_cflag |= CMSPAR;                          // enable "stick" parity
+    tty.c_cflag |= PARODD;                          // SPACE parity (0)
+    tty.c_cflag &= ~CSTOPB;                         // 1 stop bit
+    tty.c_cflag &= ~CRTSCTS;                        // no hardware flow control
+
+    if (tcsetattr(serial_fd, TCSANOW, &tty) != 0) {
+        perror("tcsetattr failed");
+        close(serial_fd);
+        MQTTClient_destroy(&client);
+        return EXIT_FAILURE;
+    }
     
     // Pufferbasierte Verarbeitung
     uint8_t buffer[BUFFER_SIZE];
@@ -299,10 +356,13 @@ int main(void) {
     while (1) {
         // Lese verfügbare Daten in den Puffer
         if (buffer_len < BUFFER_SIZE) {
+            ssize_t n = read(serial_fd, buffer + buffer_len, BUFFER_SIZE - buffer_len);
+            if (n > 0) buffer_len += n;          
+            /*
             ret = ftdi_read_data(ftdi, buffer + buffer_len, BUFFER_SIZE - buffer_len);
             if (ret > 0) {
                 buffer_len += ret;
-            }
+            }*/
         }
         // Suche im Puffer nach gültigen Startsequenzen
         size_t pos = 0;
@@ -349,7 +409,8 @@ int main(void) {
 
     MQTTClient_disconnect(client, 10000);
     MQTTClient_destroy(&client);
-    ftdi_usb_close(ftdi);
-    ftdi_free(ftdi);
+    close(serial_fd);
+    //ftdi_usb_close(ftdi);
+    //ftdi_free(ftdi);
     return EXIT_SUCCESS;
 }
