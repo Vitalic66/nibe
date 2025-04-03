@@ -240,7 +240,7 @@ int main(void) {
     }
     ftdi_list_free(&devlist);
     */
-
+    /*
     ret = ftdi_set_interface(ftdi, INTERFACE_ANY);
     if (ret < 0) {
         fprintf(stderr, "ftdi_set_interface failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
@@ -255,6 +255,16 @@ int main(void) {
         return EXIT_FAILURE;
     }
     printf("FTDI device at /dev/ttyUSB1 opened successfully.\n");
+    */
+
+    // Open specific device by serial number
+    ret = ftdi_usb_open_desc(ftdi, 0x0403, 0x6001, NULL, "B001YIW0");
+    if (ret < 0) {
+        fprintf(stderr, "Unable to open FTDI device with serial B001YIW0: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+        ftdi_free(ftdi);
+        return EXIT_FAILURE;
+    }
+    printf("FTDI device with serial B001YIW0 opened successfully.\n");
     
     ret = ftdi_set_baudrate(ftdi, 19200);
     if (ret < 0) {
