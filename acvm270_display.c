@@ -299,8 +299,11 @@ int main(void) {
         sleep(5);
         if (++attempts >= 10) {  // nach 10 Versuchen ggf. doch abbrechen
             fprintf(stderr, "Unable to connect to MQTT broker after multiple attempts.\n");
+            /*
             ftdi_usb_close(ftdi);
             ftdi_free(ftdi);
+            MQTTClient_destroy(&client);
+            */
             MQTTClient_destroy(&client);
             return EXIT_FAILURE;
         }
