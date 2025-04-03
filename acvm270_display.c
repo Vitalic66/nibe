@@ -265,6 +265,8 @@ int main(void) {
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     conn_opts.keepAliveInterval = 20;
     conn_opts.cleansession = 1;
+
+    /*
     ret = MQTTClient_connect(client, &conn_opts);
     if (ret != MQTTCLIENT_SUCCESS) {
         printf("Failed to connect to MQTT broker, return code %d\n", ret);
@@ -274,7 +276,22 @@ int main(void) {
         return EXIT_FAILURE;
     }
     printf("Connected to MQTT broker at %s.\n", MQTT_ADDRESS);
+    */
 
+    int attempts = 0;
+    while ((ret = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS) {
+        printf("Failed to connect to MQTT broker, return code %d. Retrying in 5 seconds...\n", ret);
+        sleep(5);
+        if (++attempts >= 10) {  // nach 10 Versuchen ggf. doch abbrechen
+            fprintf(stderr, "Unable to connect to MQTT broker after multiple attempts.\n");
+            ftdi_usb_close(ftdi);
+            ftdi_free(ftdi);
+            MQTTClient_destroy(&client);
+            return EXIT_FAILURE;
+        }
+    }
+    printf("Connected to MQTT broker at %s.\n", MQTT_ADDRESS);
+    
     // Pufferbasierte Verarbeitung
     uint8_t buffer[BUFFER_SIZE];
     size_t buffer_len = 0;
