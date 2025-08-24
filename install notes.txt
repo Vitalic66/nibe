@@ -84,10 +84,10 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{seria
 sudo udevadm control --reload-rules
 
 ######################################################################################
-
 services:
 
-/etc/systemd/system/acvm270_display.service
+######################################################################################
+sudo nano /etc/systemd/system/acvm270_display.service
 
 [Unit]
 Description=acvm270 display
@@ -103,9 +103,25 @@ RestartSec=3
 [Install]
 WantedBy=multi-user.target
 
+######################################################################################
+sudo nano /etc/systemd/system/acvm270_keypress.service
+
+[Unit]
+Description=acvm270 keypress
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/acvm270_keypress
+Restart=always
+RestartSec=3
+# Optional: weitere Parameter wie Environment, WorkingDirectory etc.
+
+[Install]
+WantedBy=multi-user.target
 
 ##########################################################################################
-
+sudo nano /etc/systemd/system/acvm270.service
 
 [Unit]
 Description=ACVM270 Logger Service
@@ -113,23 +129,23 @@ After=network.target
 
 [Service]
 WorkingDirectory=/usr/local/bin
-ExecStart=/usr/bin/python3 /usr/local/bin/acvm270_logger.py
+ExecStart=/usr/bin/python3 /usr/local/bin/acvm270.py
 Restart=always
 RestartSec=5
-StandardOutput=journal
-StandardError=journal
+#StandardOutput=journal
+#StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
 
 ##########################################################################################
+sudo nano /etc/systemd/system/relay.service
 
 [Unit]
 Description=relay
 After=network.target
 
 [Service]
-User=deinBenutzername
 WorkingDirectory=/usr/local/bin
 ExecStart=/usr/bin/python3 /usr/local/bin/relay.py
 Restart=always
@@ -138,9 +154,16 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 
-
+##########################################################################################
 
 
 sudo systemctl daemon-reload
-sudo systemctl enable deine_app.service
-sudo systemctl start deine_app.service
+sudo systemctl enable acvm270_keypress.service
+sudo systemctl start acvm270_keypress.service
+sudo systemctl enable relay.service
+sudo systemctl start relay.service
+sudo systemctl enable acvm270.service
+sudo systemctl start acvm270.service
+sudo systemctl enable acvm270_display.service
+sudo systemctl start acvm270_display.service
+
