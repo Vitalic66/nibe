@@ -14,7 +14,7 @@ def is_program_running(name):
 
 try:
     while True:
-        if is_program_running("keypress_mqtt"):
+        if is_program_running("acvm270_keypress"):
             GPIO.output(18, GPIO.HIGH)
         else:
             GPIO.output(18, GPIO.LOW)
