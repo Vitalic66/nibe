@@ -1,0 +1,104 @@
+/boot/config.txt
+enable_uart=1
+
+
+pigpio:
+
+https://abyz.me.uk/rpi/pigpio/download.html
+
+wget https://github.com/joan2937/pigpio/archive/master.zip
+unzip master.zip
+cd pigpio-master
+make
+sudo make install
+
+sudo apt install python-setuptools python3-setuptools
+
+paho mqtt:
+
+git clone https://github.com/eclipse-paho/paho.mqtt.c
+cd paho.mqtt.c
+
+
+sudo apt-get install build-essential gcc make cmake cmake-gui cmake-curses-gui
+sudo apt-get install fakeroot devscripts dh-make lsb-release
+sudo apt-get install libssl-dev
+sudo apt-get install doxygen graphviz
+
+make
+sudo make install
+
+ftdi:
+
+sudo apt-get install libftdil-dev //pi5
+sudo apt-get install libftdi-dev
+
+Display ttyUSB1:
+gcc -o display_c display_c.c -lftdi -lpaho-mqtt3c
+
+Tastenfeld (RS485 HAT):
+gcc -o kp_mqtt kp_mqtt.c -lpigpio -lpaho-mqtt3c -lrt -lpthread
+
+für python:
+
+sudo apt update
+sudo apt install python3-pip
+sudo pip3 install pyserial
+sudo pip3 install paho-mqtt
+
+
+#######################################################################################
+
+usb dongles:
+
+/etc/udev/rules.d/10-usb-dongle.rules
+
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001Y6HU", SYMLINK+="ttyUSB0"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001YIW0", SYMLINK+="ttyUSB1"
+
+sudo udevadm control --reload-rules
+
+######################################################################################
+
+services:
+
+/etc/systemd/system/acvm270xxxxx.service
+
+[Unit]
+Description=Dein MQTT/UART Programm
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/acvm270_display
+Restart=always
+RestartSec=3
+# Optional: weitere Parameter wie Environment, WorkingDirectory etc.
+
+[Install]
+WantedBy=multi-user.target
+
+
+##########################################################################################
+
+
+[Unit]
+Description=ACVM270 Logger Service
+After=network.target
+
+[Service]
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/bin/python3 /usr/local/bin/acvm270_logger.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable deine_app.service
+sudo systemctl start deine_app.service
