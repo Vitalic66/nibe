@@ -74,7 +74,7 @@ sudo chmod 755 /usr/local/bin/acvm270.py
 #######################################################################################
 usb dongles:
 
-/etc/udev/rules.d/10-usb-dongle.rules
+sudo nano /etc/udev/rules.d/10-usb-dongle.rules
 
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001Y6HU", SYMLINK+="ttyUSB0"
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001YIW0", SYMLINK+="ttyUSB1"
