@@ -1,9 +1,17 @@
+acvm270_keypress.c ( keypress_mqtt )- simulate keypress in HA->MQTT->Pi->RS485-HAT->Nibe
+
+acvm270_display.c - read nibe bus (dsiplay messages) /dev/ttyUSB1->MQTT->HA
+
+acvm270.py - read nibe bus (all messages) Nibe->/dev/ttyUSB0->Pi->MQTT->HA
+
+relay.py - cut connection to Nibe bus in case of faulty pi
+
+
 /boot/config.txt
 enable_uart=1
 
 
 pigpio:
-
 sudo apt install python-setuptools python3-setuptools
 
 https://abyz.me.uk/rpi/pigpio/download.html
@@ -14,43 +22,58 @@ cd pigpio-master
 make
 sudo make install
 
-
+für python:
+sudo apt update
+sudo apt install python3-pip
+sudo pip3 install pyserial
+sudo pip3 install paho-mqtt
 
 paho mqtt:
 sudo apt install git
 git clone https://github.com/eclipse-paho/paho.mqtt.c
 cd paho.mqtt.c
-
-
 sudo apt-get install build-essential gcc make cmake cmake-gui cmake-curses-gui
 sudo apt-get install fakeroot devscripts dh-make lsb-release
 sudo apt-get install libssl-dev
 sudo apt-get install doxygen graphviz
-
 make
 sudo make install
+
+#######################################################################################
+ACVM270_display:
 
 ftdi:
 
 sudo apt-get install libftdil-dev //pi5
 sudo apt-get install libftdi-dev
 
-Display ttyUSB1:
+wget https://raw.githubusercontent.com/Vitalic66/nibe/refs/heads/main/acvm270_display.c
+
 gcc -o display_c display_c.c -lftdi -lpaho-mqtt3c
-
-Tastenfeld (RS485 HAT):
-gcc -o kp_mqtt kp_mqtt.c -lpigpio -lpaho-mqtt3c -lrt -lpthread
-
-für python:
-
-sudo apt update
-sudo apt install python3-pip
-sudo pip3 install pyserial
-sudo pip3 install paho-mqtt
-
+sudo cp acvm270_display /usr/local/bin/acvm270_display
+sudo chmod 755 /usr/local/bin/acvm270_display
 
 #######################################################################################
+Tastenfeld (RS485 HAT):
+wget https://raw.githubusercontent.com/Vitalic66/nibe/refs/heads/main/acvm270_keypress.c
+gcc -o kp_mqtt kp_mqtt.c -lpigpio -lpaho-mqtt3c -lrt -lpthread
+sudo cp acvm270_keypress /usr/local/bin/acvm270_keypress
+sudo chmod 755 /usr/local/bin/acvm270_keypress
 
+#######################################################################################
+für relais:
+sudo apt-get install rpi.gpio
+wget https://raw.githubusercontent.com/Vitalic66/nibe/refs/heads/main/relay.py
+sudo cp relay.py /usr/local/bin/relay.py
+sudo chmod 755 /usr/local/bin/relay.py
+
+#######################################################################################
+nibe bus logging:
+wget https://raw.githubusercontent.com/Vitalic66/nibe/refs/heads/main/acvm270.py
+sudo cp acvm270.py /usr/local/bin/acvm270.py
+sudo chmod 755 /usr/local/bin/acvm270.py
+
+#######################################################################################
 usb dongles:
 
 /etc/udev/rules.d/10-usb-dongle.rules
@@ -64,10 +87,10 @@ sudo udevadm control --reload-rules
 
 services:
 
-/etc/systemd/system/acvm270xxxxx.service
+/etc/systemd/system/acvm270_display.service
 
 [Unit]
-Description=Dein MQTT/UART Programm
+Description=acvm270 display
 After=network.target
 
 [Service]
@@ -98,6 +121,23 @@ StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
+
+##########################################################################################
+
+[Unit]
+Description=relay
+After=network.target
+
+[Service]
+User=deinBenutzername
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/bin/python3 /usr/local/bin/relay.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
 
 
 
