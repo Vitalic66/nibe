@@ -4,6 +4,8 @@ enable_uart=1
 
 pigpio:
 
+sudo apt install python-setuptools python3-setuptools
+
 https://abyz.me.uk/rpi/pigpio/download.html
 
 wget https://github.com/joan2937/pigpio/archive/master.zip
@@ -12,10 +14,10 @@ cd pigpio-master
 make
 sudo make install
 
-sudo apt install python-setuptools python3-setuptools
+
 
 paho mqtt:
-
+sudo apt install git
 git clone https://github.com/eclipse-paho/paho.mqtt.c
 cd paho.mqtt.c
 
