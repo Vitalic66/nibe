@@ -1,2 +1,9 @@
-SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001Y6HU", SYMLINK+="ttyUSB0"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001YIW0", SYMLINK+="ttyUSB1"
+# Adapter mit SN=B001Y6HU -> fester Name
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyUSB*", \
+  ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001Y6HU", \
+  SYMLINK+="ttyRS485_A", GROUP="dialout", MODE="0660"
+
+# Adapter mit SN=B001YIW0 -> anderer fester Name
+#ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyUSB*", \
+#  ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001YIW0", \
+#  SYMLINK+="ttyRS485_B", GROUP="dialout", MODE="0660"
