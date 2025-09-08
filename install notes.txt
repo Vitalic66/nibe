@@ -1,8 +1,8 @@
 acvm270_keypress.c - simulate keypress in HA->MQTT->Pi->RS485-HAT->Nibe
 
-acvm270_display.c - read nibe bus (display messages) /dev/ttyUSB1->Pi->MQTT->HA
+acvm270_display.c - read nibe bus (display messages) /dev/ttyUSB1->Pi->MQTT->HA (ttyUSB1 is removed when program starts, gets used by serial number instead)
 
-acvm270.py - read nibe bus (all messages) Nibe->/dev/ttyUSB0->Pi->MQTT->HA
+acvm270.py - read nibe bus (all messages) Nibe->/dev/ttyRS485_A->Pi->MQTT->HA
 
 relay.py - cut connection to Nibe bus in case of faulty pi or program hanging
 
@@ -76,8 +76,22 @@ usb dongles:
 
 sudo nano /etc/udev/rules.d/10-usb-dongle.rules
 
+old version:
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001Y6HU", SYMLINK+="ttyUSB0"
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001YIW0", SYMLINK+="ttyUSB1"
+
+active version:
+
+# Adapter mit SN=B001Y6HU -> fester Name
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyUSB*", \
+  ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001Y6HU", \
+  SYMLINK+="ttyRS485_A", GROUP="dialout", MODE="0660"
+
+# Adapter mit SN=B001YIW0 -> anderer fester Name
+#ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyUSB*", \
+#  ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="B001YIW0", \
+#  SYMLINK+="ttyRS485_B", GROUP="dialout", MODE="0660"
+
 
 sudo udevadm control --reload-rules
 
