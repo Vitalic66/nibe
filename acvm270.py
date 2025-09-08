@@ -26,8 +26,8 @@ def publish_availability(status):
     logger.info(f"Published availability status: {status}")
 
 # Serial connection to Nibe heat pump (adjust COM port for Windows)
-serial_port = "/dev/ttyUSB0"  # Adjust to your correct COM port
-#serial_port = "/dev/serial/by-id/usb-WCH.CN_USB_Quad_Serial_BC0449ABCD-if02"
+#serial_port = "/dev/ttyUSB0"  # Adjust to your correct COM port
+serial_port = "/dev/ttyRS485_A"
 ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
 
 logger.debug("Serial port opened successfully")
