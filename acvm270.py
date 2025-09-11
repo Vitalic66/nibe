@@ -1,4 +1,4 @@
-import logging
+#import logging
 import serial
 import time
 import paho.mqtt.client as mqtt
@@ -6,8 +6,8 @@ from struct import unpack, pack
 
 # Setup logger
 #logging.basicConfig(level=logging.WARNING)
-logging.basicConfig(level=logging.WARNING, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('NIBE')
+#logging.basicConfig(level=logging.WARNING, filename='nibe_debug.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
+#logger = logging.getLogger('NIBE')
 
 # MQTT setup
 mqtt_client = mqtt.Client()
@@ -18,19 +18,19 @@ mqtt_client.connect("192.168.178.92", 1883, 60)
 
 def publish_mqtt(topic, message):
     mqtt_client.publish(topic, message)
-    logger.info(f"Published {message} to {topic}")
+    #logger.info(f"Published {message} to {topic}")
 
 # Publish "online" status to availability topic
 def publish_availability(status):
     mqtt_client.publish("nibe/status", status, retain=True)
-    logger.info(f"Published availability status: {status}")
+    #logger.info(f"Published availability status: {status}")
 
 # Serial connection to Nibe heat pump (adjust COM port for Windows)
 #serial_port = "/dev/ttyUSB0"  # Adjust to your correct COM port
 serial_port = "/dev/ttyRS485_A"
 ser = serial.Serial(serial_port, 19200, bytesize=serial.EIGHTBITS, stopbits=serial.STOPBITS_ONE, parity=serial.PARITY_MARK, timeout=3)
 
-logger.debug("Serial port opened successfully")
+#logger.debug("Serial port opened successfully")
 
 # Register mapping, expanded to match original script
 nibe_registers = {
@@ -481,7 +481,7 @@ def publish_discovery_payloads():
 
         # Publish the discovery payload as JSON
         mqtt_client.publish(discovery_topic, str(payload).replace("'", '"'), qos=0, retain=True)
-        logger.info(f"Published MQTT discovery payload for {config['name']}")
+        #logger.info(f"Published MQTT discovery payload for {config['name']}")
 
 # Initialize global variables to store register 28, 29, and 30 values
 reg28_value = None
@@ -499,15 +499,15 @@ def _decode(reg, raw):
     # Handle registers 28, 29, and 30
     if reg == 28:
         reg28_value = value
-        logger.debug(f"Register 28 (operation mode) value: {reg28_value}")
+        #logger.debug(f"Register 28 (operation mode) value: {reg28_value}")
         return None  # Avoid falling through to unhandled case
     elif reg == 29:
         reg29_value = value
-        logger.debug(f"Register 29 (operation mode) value: {reg29_value}")
+        #logger.debug(f"Register 29 (operation mode) value: {reg29_value}")
         return None  # Avoid falling through to unhandled case
     elif reg == 30:
         reg30_value = value
-        logger.debug(f"Register 30 (operation mode) value: {reg30_value}")
+        #logger.debug(f"Register 30 (operation mode) value: {reg30_value}")
 
         # Now that we have all three registers, interpret the state
         if reg28_value == 0x0000 and reg29_value == 0x8222 and reg30_value == 0x0032:
@@ -551,19 +551,19 @@ def _decode(reg, raw):
         elif reg28_value == 17409 and reg29_value == 41514 and reg30_value == 30:
             publish_mqtt("nibe/operation_mode", "Brauchwasser") #domestic water
         else:
-            logger.warning(f"Unknown combination of register values: reg28={reg28_value}, reg29={reg29_value}, reg30={reg30_value}")
+            #logger.warning(f"Unknown combination of register values: reg28={reg28_value}, reg29={reg29_value}, reg30={reg30_value}")
             publish_mqtt("nibe/operation_mode", f"Unknown mode: reg28={reg28_value}, reg29={reg29_value}, reg30={reg30_value}")
         return None  # Avoid falling through to unhandled case
 
     # Handle additional heating using nibe/additional_heating_allowed
     if reg == 32:
-        logger.debug(f"Register 32 (additional heating allowed) value: {value}")
+        #logger.debug(f"Register 32 (additional heating allowed) value: {value}")
         publish_mqtt("nibe/additional_heating_allowed", str(value))
         return None
 
     # Handle heating status using register 31
     if reg == 31:
-        logger.debug(f"Register 31 (heating status) value: {value}")
+        #logger.debug(f"Register 31 (heating status) value: {value}")
         if value == 1:
             publish_mqtt("nibe/heating_status", "auto")
         elif value == 3:
@@ -576,32 +576,32 @@ def _decode(reg, raw):
 
     # Handle temperature and flow registers
     if reg in [1, 5, 6, 7, 12, 23, 11, 13, 14, 15, 16, 17, 18, 21]:
-        logger.debug(f"Register {reg} (temperature/flow) value: {value}")
+        #logger.debug(f"Register {reg} (temperature/flow) value: {value}")
         return float(unpack('h', pack('H', value))[0] / 10)
 
     # Handle general integer registers
     if reg in [0, 33, 34, 35, 36, 38, 44, 45, 46, 48, 100, 101, 102, 103, 104, 105]:
-        logger.debug(f"Register {reg} (general integer) value: {value}")
+        #logger.debug(f"Register {reg} (general integer) value: {value}")
         return int(value)
 
     # Handle signed values for heating curve and degree minutes
     if reg in [4, 8]:
-        logger.debug(f"Register {reg} (signed value) value: {value}")
+        #logger.debug(f"Register {reg} (signed value) value: {value}")
         return int(unpack('h', pack('H', value))[0] / 10)
 
     # Handle compressor starts
     if reg == 25:
-        logger.debug(f"Register 25 (compressor starts) value: {value}")
+        #logger.debug(f"Register 25 (compressor starts) value: {value}")
         return int(value / 10)
 
     # Handle frequency, pressure, phase, and runtime registers
     if reg in [9, 10, 19, 22, 24]:
-        logger.debug(f"Register {reg} (frequency/pressure) value: {value}")
+        #logger.debug(f"Register {reg} (frequency/pressure) value: {value}")
         return float(value / 10)
 
     # Low pressure return value + 30
     if reg == 20:
-        logger.debug(f"Register {reg} (temperature/flow) value: {value}")
+        #logger.debug(f"Register {reg} (temperature/flow) value: {value}")
         if value > 100:
             return float((unpack('h', pack('H', value))[0] / 10) - 30)
         else:
@@ -609,28 +609,28 @@ def _decode(reg, raw):
 
     # Handle hysteresis and BW registers
     if reg in [40, 47]:
-        logger.debug(f"Register {reg} (hysteresis/BW reg) value: {value}")
+        #logger.debug(f"Register {reg} (hysteresis/BW reg) value: {value}")
         return float(value / 2)
 
     # Handle stop temperature and domestic water temperatures
     if reg in [43, 49, 50]:
-        logger.debug(f"Register {reg} (temperature) value: {value}")
+        #logger.debug(f"Register {reg} (temperature) value: {value}")
         return float(value)
 
     # Handle 8b message temperatures
     if reg in [128, 129, 131, 135]:
-        logger.debug(f"Register {reg} (temperature) value: {value}")
+        #logger.debug(f"Register {reg} (temperature) value: {value}")
         return float(unpack('h', pack('H', value))[0] / 10)
 
     # Log unknown registers
-    logger.warning(f"Register {reg} is not handled")
+    #logger.warning(f"Register {reg} is not handled")
     return None
 
 
 
 
 def run():
-    logger.info("Starting the main loop...")
+    #logger.info("Starting the main loop...")
 
     # Publish availability as "online" at the start of the script
     publish_availability("online")
@@ -643,12 +643,12 @@ def run():
         while True:
             try:
                 if ser.read(1)[0] != 0x03:
-                    logger.debug("No start byte found")
+                    #logger.debug("No start byte found")
                     continue
-                logger.debug("Start byte found, reading data...")
+                #logger.debug("Start byte found, reading data...")
                 ret = ser.read(2)
                 if ret[0] != 0x00 or (ret[1] not in [0x14, 0xf1]):
-                    logger.debug("Invalid start frame")
+                    #logger.debug("Invalid start frame")
                     continue
                 if ret[1] == 0x14:
                     ser.write(b"\x06")
@@ -662,7 +662,7 @@ def run():
                     for i in frm[:-1]:
                         crc ^= i
                     if crc != frm[-1]:
-                        logger.warning("Frame CRC error")
+                        #logger.warning("Frame CRC error")
                         continue
                     msg = frm[4:-1]
                     l = len(msg)
@@ -683,10 +683,10 @@ def run():
                 #else:
                     #logger.debug(f"Unbekannter Nachrichtentyp: {ret[1]}")
             except Exception as e:
-                logger.warning(f"Error in Nibe data processing: {e}")
+                #logger.warning(f"Error in Nibe data processing: {e}")
                 time.sleep(1)
-    except KeyboardInterrupt:
-        logger.info("Script interrupted, shutting down...")
+    #except KeyboardInterrupt:
+        #logger.info("Script interrupted, shutting down...")
     finally:
         # Publish availability as "offline" when the script is stopped
         publish_availability("offline")
@@ -694,5 +694,5 @@ def run():
         mqtt_client.disconnect()
 
 if __name__ == "__main__":
-    logger.info("Starting Nibe heat pump MQTT bridge")
+    #logger.info("Starting Nibe heat pump MQTT bridge")
     run()
