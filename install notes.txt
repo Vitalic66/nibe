@@ -179,3 +179,26 @@ sudo systemctl start acvm270.service
 sudo systemctl enable acvm270_display.service
 sudo systemctl start acvm270_display.service
 
+##########################################################################################
+
+make it read only fs
+
+sudo nano /etc/fstab
+change:
+PARTUUID=xxxx-xxxx  /  ext4  defaults,noatime  0  1
+to:
+PARTUUID=xxxx-xxxx  /  ext4  ro,noatime  0  1
+add:
+tmpfs   /tmp        tmpfs   defaults,noatime,nosuid,nodev,mode=1777,size=50M   0  0
+tmpfs   /var/tmp    tmpfs   defaults,noatime,nosuid,nodev,mode=1777,size=20M   0  0
+tmpfs   /var/log    tmpfs   defaults,noatime,nosuid,nodev,mode=0755,size=50M   0  0
+tmpfs   /run        tmpfs   defaults,noatime,nosuid,nodev,mode=0755,size=20M   0  0
+
+close & save
+
+sudo rm -rf /var/log/*
+sudo touch /var/log/syslog
+sudo touch /var/log/messages
+sudo chmod 644 /var/log/*
+
+
