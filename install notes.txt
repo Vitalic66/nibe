@@ -117,6 +117,33 @@ WantedBy=multi-user.target
 
 ######################################################################################
 sudo nano /etc/systemd/system/acvm270_keypress.service
+neu:
+
+[Unit]
+Description=acvm270 keypress (C binary, no logs)
+Requires=rs485-relay.service
+After=rs485-relay.service
+
+# Wenn du „späten“ Start willst (nach Boot fertig), entkommentiere:
+# Wants=network-online.target
+# After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/acvm270_keypress
+Restart=on-failure
+RestartSec=2
+# Kein Journald
+StandardOutput=null
+StandardError=null
+# (falls das Binary WorkingDirectory braucht, hier setzen)
+# WorkingDirectory=/usr/local/bin
+
+[Install]
+WantedBy=multi-user.target
+
+######################################################################################
+veraltet:
 
 [Unit]
 Description=acvm270 keypress
@@ -151,6 +178,31 @@ RestartSec=5
 WantedBy=multi-user.target
 
 ##########################################################################################
+neu:
+sudo nano /etc/systemd/system/rs485-relay.service
+
+[Unit]
+Description=RS485 relay enable on GPIO18 (no logs)
+Before=acvm270_keypress.service
+PartOf=acvm270_keypress.service
+
+[Service]
+Type=oneshot
+# Relais EIN (GPIO18 Output, Drive High)
+ExecStart=/usr/bin/raspi-gpio set 18 op dh
+# Relais AUS (GPIO18 Output, Drive Low)
+ExecStop=/usr/bin/raspi-gpio set 18 op dl
+RemainAfterExit=yes
+# Kein Journald
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=multi-user.target
+
+##########################################################################################
+
+veraltet:
 sudo nano /etc/systemd/system/relay.service
 
 [Unit]
@@ -167,7 +219,11 @@ RestartSec=5
 WantedBy=multi-user.target
 
 ##########################################################################################
+if existss in /boot/cmdline.txt
+remove
+console=serial0,115200
 
+##########################################################################################
 
 sudo systemctl daemon-reload
 sudo systemctl enable acvm270_keypress.service
@@ -192,7 +248,7 @@ add:
 tmpfs   /tmp        tmpfs   defaults,noatime,nosuid,nodev,mode=1777,size=50M   0  0
 tmpfs   /var/tmp    tmpfs   defaults,noatime,nosuid,nodev,mode=1777,size=20M   0  0
 tmpfs   /var/log    tmpfs   defaults,noatime,nosuid,nodev,mode=0755,size=50M   0  0
-tmpfs   /run        tmpfs   defaults,noatime,nosuid,nodev,mode=0755,size=20M   0  0
+tmpfs   /run        tmpfs   defaults,noatime,nosuid,nodev,mode=0755,size=100M   0  0
 
 close & save
 
